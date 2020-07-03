@@ -1,0 +1,53 @@
+CREATE TABLE yonghu (
+  yonghubianhao int(11) NOT NULL,
+  xingming varchar(50) NOT NULL,
+  xingbie varchar(5) NOT NULL check (xingbie = '男'or xingbie = '女'),
+  mima varchar(50) NOT NULL,
+  shoujihaoma varchar(50) NOT NULL,
+  youxiang varchar(50) NOT NULL,
+  suozaichengshi varchar(50) NOT NULL,
+  zhuceshijian datetime NOT NULL,
+  shifouhuiyuan boolean NOT NULL,
+  huiyuanjiezhishijian datetime,
+  PRIMARY KEY (yonghubianhao)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE peisongdizhi (
+  dizhibianhao int(11) NOT NULL,
+  yonghubianhao int(11) NOT NULL,
+  sheng varchar(50) NOT NULL,
+  shi varchar(50) NOT NULL,
+  qu varchar(50) NOT NULL,
+  dizhi varchar(255) NOT NULL,
+  lianxiren varchar(50) NOT NULL,
+  dianhua varchar(50) NOT NULL,
+  PRIMARY KEY (dizhibianhao),
+  FOREIGN KEY (yonghubianhao) REFERENCES yonghu(yonghubianhao)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE shangpindingdan (
+  dingdanbianhao int(11) NOT NULL,
+  yonghubianhao int(11) NOT NULL,
+  yuanshijine double NOT NULL,
+  jiesuanjine double NOT NULL,
+  shiyongyouhuiquanbianhao int(11),
+  yaoqiusongdashijian datetime NOT NULL,
+  peisongdizhibianhao int(11) NOT NULL,
+  dingdanzhuangtai varchar(5) NOT NULL check(dingdanchuangtai in ('下单','配送','送达','退货')),
+  PRIMARY KEY (dingdanbianhao),
+  FOREIGN KEY (shiyongyouhuiquanbianhao) REFERENCES youhuiquan(youhuiquanbianhao),
+  FOREIGN KEY (yonghubianhao) REFERENCES yonghu(yonghubianhao),
+  FOREIGN KEY (peisongdizhibianhao) REFERENCES peisongdizhi(dizhibianhao)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE dingdanxiangqing (
+  dingdanbianhao int(11) NOT NULL,
+  shangpinbianhao int(11) NOT NULL,
+  shuliang double NOT NULL,
+  jiage double NOT NULL,
+  zhekou double,
+  manzhebianhao int(11),
+  PRIMARY KEY (dingdanbianhao),
+  FOREIGN KEY (shangpinbianhao) REFERENCES shangpin(shangpinbianhao),
+  FOREIGN KEY (manzhebianhao) REFERENCES manzhe(manzhebianhao)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

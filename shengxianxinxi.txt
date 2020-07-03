@@ -1,0 +1,43 @@
+CREATE TABLE shengxianleibie (
+  leibiebianhao int(11) NOT NULL,
+  leibiemingcheng varchar(50) NOT NULL,
+  leibiemiaoshu varchar(255) NOT NULL,
+  PRIMARY KEY (leibiebianhao)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE shangpin (
+  shangpinbianhao int(11) NOT NULL,
+  shangpinmingcheng varchar(50) NOT NULL,
+  jiage double NOT NULL,
+  huiyuanjia double NOT NULL,
+  shuliang double NOT NULL,
+  guige varchar(50) NOT NULL,
+  xiangqing varchar(255) NOT NULL,
+  PRIMARY KEY (shangpinbianhao)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE caipu (
+  caipubianhao int(11) NOT NULL,
+  caipumingcheng varchar(50) NOT NULL,
+  caipuyongliao varchar(255) NOT NULL,
+  buzhou varchar(255) NOT NULL,
+  tupian varchar(255) NOT NULL,
+  PRIMARY KEY (caipubianhao)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE shangpincaiputuijian (
+  shangpinbianhao int(11) NOT NULL,
+  caipubianhao int(11) NOT NULL,
+  miaoshu varchar(255) NOT NULL,
+  PRIMARY KEY (shangpinbianhao,caipubianhao)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE shangpinpingjia (
+  shangpinbianhao int(11) NOT NULL,
+  pingjiayonghubianhao int(11) NOT NULL,
+  pingjianeirong varchar(255) NOT NULL,
+  pingjiariqi datetime NOT NULL,
+  xingji int(11) NOT NULL check (xingji > 0 and xingji < 6),
+  zhaopian varchar(255) NOT NULL,
+  PRIMARY KEY (shangpinbianhao,pingjiayonghubianhao)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

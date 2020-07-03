@@ -1,0 +1,37 @@
+CREATE TABLE youhuiquan (
+  youhuiquanbianhao int(11) NOT NULL,
+  neirong varchar(255) NOT NULL,
+  shiyongjine double NOT NULL,
+  jianmianjine double NOT NULL,
+  qishiriqi datetime NOT NULL,
+  jieshuriqi datetime NOT NULL,
+  PRIMARY KEY (youhuiquanbianhao)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE manzhe (
+  manzhebianhao int(11) NOT NULL,
+  neirong varchar(255) NOT NULL,
+  shiyongshangpinshuliang double NOT NULL,
+  zhekou double NOT NULL,
+  qishiriqi datetime NOT NULL,
+  jieshuriqi datetime NOT NULL,
+  PRIMARY KEY (manzhebianhao)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE manzheshangpinguanlian (
+  manzhebianhao int(11) NOT NULL,
+  shangpinbianhao int(11) NOT NULL,
+  qishiriqi datetime NOT NULL,
+  jieshuriqi datetime NOT NULL,
+  PRIMARY KEY (manzhebianhao,shangpinbianhao)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE xianshicuxiao (
+  cuxiaobianhao int(11) NOT NULL,
+  shangpinbianhao int(11) NOT NULL,
+  cuxiaojiage double NOT NULL,
+  cuxiaoshuliang double NOT NULL,
+  qishiriqi datetime NOT NULL,
+  jieshuriqi datetime NOT NULL,
+  PRIMARY KEY (cuxiaobianhao,shangpinbianhao)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

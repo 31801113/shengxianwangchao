@@ -1,0 +1,14 @@
+CREATE TABLE shangpincaigou (
+  caigoudanbianhao int(11) NOT NULL,
+  shicaibianhao int(11) NOT NULL,
+  shuliang double NOT NULL,
+  zhuangtai varchar(50) NOT NULL check (zhuangtai in ('下单','在途','入库')),
+  PRIMARY KEY (caigoudanbianhao)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE guanliyuan (
+  yuangongbianhao int(11) NOT NULL,
+  yuangongxingming varchar(50) NOT NULL,
+  denglumima varchar(50) NOT NULL,
+  PRIMARY KEY (yuangongbianhao)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
