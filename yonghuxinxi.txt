@@ -13,7 +13,7 @@ CREATE TABLE yonghu (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE peisongdizhi (
-  dizhibianhao int(11) NOT NULL,
+  dizhibianhao int(11) NOT NULL AUTO_INCREMENT,
   yonghubianhao int(11) NOT NULL,
   sheng varchar(50) NOT NULL,
   shi varchar(50) NOT NULL,
@@ -26,7 +26,7 @@ CREATE TABLE peisongdizhi (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE shangpindingdan (
-  dingdanbianhao int(11) NOT NULL,
+  dingdanbianhao int(11) NOT NULL AUTO_INCREMENT,
   yonghubianhao int(11) NOT NULL,
   yuanshijine double NOT NULL,
   jiesuanjine double NOT NULL,

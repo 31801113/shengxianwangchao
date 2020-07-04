@@ -1,5 +1,5 @@
 CREATE TABLE youhuiquan (
-  youhuiquanbianhao int(11) NOT NULL,
+  youhuiquanbianhao int(11) NOT NULL AUTO_INCREMENT,
   neirong varchar(255) NOT NULL,
   shiyongjine double NOT NULL,
   jianmianjine double NOT NULL,
@@ -9,7 +9,7 @@ CREATE TABLE youhuiquan (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE manzhe (
-  manzhebianhao int(11) NOT NULL,
+  manzhebianhao int(11) NOT NULL AUTO_INCREMENT,
   neirong varchar(255) NOT NULL,
   shiyongshangpinshuliang double NOT NULL,
   zhekou double NOT NULL,
@@ -27,7 +27,7 @@ CREATE TABLE manzheshangpinguanlian (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE xianshicuxiao (
-  cuxiaobianhao int(11) NOT NULL,
+  cuxiaobianhao int(11) NOT NULL AUTO_INCREMENT,
   shangpinbianhao int(11) NOT NULL,
   cuxiaojiage double NOT NULL,
   cuxiaoshuliang double NOT NULL,

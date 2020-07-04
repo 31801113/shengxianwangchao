@@ -1,23 +1,25 @@
 CREATE TABLE shengxianleibie (
-  leibiebianhao int(11) NOT NULL,
+  leibiebianhao int(11) NOT NULL AUTO_INCREMENT,
   leibiemingcheng varchar(50) NOT NULL,
   leibiemiaoshu varchar(255) NOT NULL,
   PRIMARY KEY (leibiebianhao)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE shangpin (
-  shangpinbianhao int(11) NOT NULL,
+  shangpinbianhao int(11) NOT NULL AUTO_INCREMENT,
   shangpinmingcheng varchar(50) NOT NULL,
   jiage double NOT NULL,
   huiyuanjia double NOT NULL,
   shuliang double NOT NULL,
   guige varchar(50) NOT NULL,
   xiangqing varchar(255) NOT NULL,
-  PRIMARY KEY (shangpinbianhao)
+  leibiebianhao int(11) NOT NULL,
+  PRIMARY KEY (shangpinbianhao),
+  FOREIGN KEY (leibiebianhao) REFERENCES shengxianleibie(leibiebianhao)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE caipu (
-  caipubianhao int(11) NOT NULL,
+  caipubianhao int(11) NOT NULL AUTO_INCREMENT,
   caipumingcheng varchar(50) NOT NULL,
   caipuyongliao varchar(255) NOT NULL,
   buzhou varchar(255) NOT NULL,

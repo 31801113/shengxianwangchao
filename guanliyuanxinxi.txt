@@ -1,5 +1,5 @@
 CREATE TABLE shangpincaigou (
-  caigoudanbianhao int(11) NOT NULL,
+  caigoudanbianhao int(11) NOT NULL AUTO_INCREMENT,
   shicaibianhao int(11) NOT NULL,
   shuliang double NOT NULL,
   zhuangtai varchar(50) NOT NULL check (zhuangtai in ('下单','在途','入库')),
