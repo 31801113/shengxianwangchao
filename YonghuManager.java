@@ -6,6 +6,7 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
+import itf.IYonghuManager;
 import model.BeanGuanliyuan;
 import model.BeanYonghu;
 import util.BaseException;
@@ -13,10 +14,10 @@ import util.BusinessException;
 import util.DBUtil;
 import util.DbException;
 
-public class YonghuManager {
-	public BeanYonghu reg(Integer yonghubianhao, String xingming, String xingbie,String mima,String querenmima,String shoujihaoma,String youxiang,String suozaichengshi,int shifouhuiyuan,String huiyuanjiezhishijian) throws BaseException {
+public class YonghuManager implements IYonghuManager {
+	public BeanYonghu reg(String yonghubianhao, String xingming, String xingbie,String mima,String querenmima,String shoujihaoma,String youxiang,String suozaichengshi,String shifouhuiyuan,String huiyuanjiezhishijian) throws BaseException {
 		// TODO Auto-generated method stub
-		if("".equals(yonghubianhao.toString()) || yonghubianhao == null){
+		if("".equals(yonghubianhao) || yonghubianhao == null){
 			throw new BusinessException("用户编号不能为空");
 		}
 		if("".equals(xingming) || xingming == null){
@@ -49,11 +50,16 @@ public class YonghuManager {
 		{
 			throw new BusinessException("所在城市不能为空");
 		}
-		if (shifouhuiyuan != 0 && shifouhuiyuan != 1)
+		if (shifouhuiyuan == null || "".equals(shifouhuiyuan))
+		{
+			throw new BusinessException("是否会员不能为空");
+		}
+		int shifouhuiyuan1 = Integer.valueOf(shifouhuiyuan);
+		if (shifouhuiyuan1 != 0 && shifouhuiyuan1 != 1)
 		{
 			throw new BusinessException("请用1表示为会员，0表示非会员，请勿输入其它数字");
 		}
-		if (shifouhuiyuan == 1 && huiyuanjiezhishijian == null)
+		if (shifouhuiyuan1 == 1 && huiyuanjiezhishijian == null)
 		{
 			throw new BusinessException("会员截止日期为空");
 		}
@@ -66,7 +72,7 @@ public class YonghuManager {
 			e1.printStackTrace();
 			throw new BusinessException("会员截止时间格式错误");
 		}
-		if (shifouhuiyuan == 1 && time.getTime() < System.currentTimeMillis())
+		if (shifouhuiyuan1 == 1 && time.getTime() < System.currentTimeMillis())
 		{
 			throw new BusinessException("会员截止日期早于当前时间，会员信息无意义");
 		}
@@ -75,26 +81,26 @@ public class YonghuManager {
 			conn=DBUtil.getConnection();
 			String sql="select * from yonghu where yonghubianhao = ?";
 			java.sql.PreparedStatement pst=conn.prepareStatement(sql);
-			pst.setInt(1,yonghubianhao);
+			pst.setInt(1,Integer.valueOf(yonghubianhao));
 			java.sql.ResultSet rs=pst.executeQuery();
 			if(rs.next()) throw new BusinessException("用户账号已经存在");
 			rs.close();
 			pst.close();
 			sql="insert into yonghu(yonghubianhao,xingming,xingbie,mima,shoujihaoma,youxiang,suozaichengshi,zhuceshijian,shifouhuiyuan,huiyuanjiezhishijian) values (?,?,?,?,?,?,?,NOW(),?,?);";
 			pst=conn.prepareStatement(sql);
-			pst.setInt(1, yonghubianhao);
+			pst.setInt(1, Integer.valueOf(yonghubianhao));
 			pst.setString(2, xingming);
 			pst.setString(3, xingbie);
 			pst.setString(4, mima);
 			pst.setString(5, shoujihaoma);
 			pst.setString(6, youxiang);
 			pst.setString(7, suozaichengshi);
-			pst.setInt(8, shifouhuiyuan);
+			pst.setInt(8, shifouhuiyuan1);
 			pst.setTimestamp(9, time);
 			pst.execute();
 			pst.close();
 			BeanYonghu u=new BeanYonghu();
-			u.setYonghubianhao(yonghubianhao);
+			u.setYonghubianhao(Integer.valueOf(yonghubianhao));
 			u.setXingming(xingming);
 			u.setXingbie(xingbie);
 			u.setMima(mima);
@@ -102,7 +108,7 @@ public class YonghuManager {
 			u.setYouxiang(youxiang);
 			u.setSuozaichengshi(suozaichengshi);
 			u.setZhuceshijian(new Timestamp(System.currentTimeMillis()));
-			u.setShifouhuiyuan(shifouhuiyuan);
+			u.setShifouhuiyuan(shifouhuiyuan1);
 			u.setHuiyuanjiezhiriqi(time);
 			return u;
 		} catch (SQLException e) {
@@ -120,21 +126,36 @@ public class YonghuManager {
 		}
 		}
 	
-	public BeanYonghu login(Integer yonghubianhao, String mima) throws BaseException {
+	public BeanYonghu login(String yonghubianhao, String mima) throws BaseException {
 		// TODO Auto-generated method stub
+		if (yonghubianhao == null || "".equals(yonghubianhao))
+		{
+			throw new BusinessException("用户编号不能为空");
+		}
+		if (mima == null || "".equals(mima))
+		{
+			throw new BusinessException("密码不能为空");
+		}
 		Connection conn=null;
 		try {
 			conn=DBUtil.getConnection();
 			String sql="select yonghubianhao,xingming,xingbie,mima,shoujihaoma,youxiang,suozaichengshi,zhuceshijian,shifouhuiyuan,huiyuanjiezhishijian from yonghu where yonghubianhao = ?";
 			java.sql.PreparedStatement pst=conn.prepareStatement(sql);
-			pst.setInt(1,yonghubianhao);
+			pst.setInt(1,Integer.valueOf(yonghubianhao));
 			java.sql.ResultSet rs=pst.executeQuery();
 			if(!rs.next()) throw new BusinessException ("员工账号不存在");
-			BeanGuanliyuan u=new BeanGuanliyuan();
-			u.setYuangongbianhao(rs.getInt(1));
-			u.setYuangongxingming(rs.getString(2));
-			u.setDenglumima(rs.getString(3));
-			if(!denglumima.equals(u.getDenglumima())) throw new BusinessException("密码错误");
+			BeanYonghu u=new BeanYonghu();
+			u.setYonghubianhao(rs.getInt(1));
+			u.setXingming(rs.getString(2));
+			u.setXingbie(rs.getString(3));
+			u.setMima(rs.getString(4));
+			if(!mima.equals(u.getMima())) throw new BusinessException("密码错误");
+			u.setShoujihaoma(rs.getString(5));
+			u.setYouxiang(rs.getString(6));
+			u.setSuozaichengshi(rs.getString(7));
+			u.setZhuceshijian(rs.getTimestamp(8));
+			u.setShifouhuiyuan(rs.getInt(9));
+			u.setHuiyuanjiezhiriqi(rs.getTimestamp(10));
 			rs.close();
 			pst.close();
 			return u;
