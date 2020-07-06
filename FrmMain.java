@@ -66,13 +66,47 @@ public class FrmMain extends JFrame implements ActionListener{
 			FrmZengjiaYonghu dlg=new FrmZengjiaYonghu(this,"增加用户",true);
 			dlg.setVisible(true);
 		}
-		
+		else if (e.getSource() == menuItem_ShanchuYonghu)
+		{
+			FrmShanchuYonghu dlg = new FrmShanchuYonghu(this,"删除用户",true);
+			dlg.setVisible(true);
+		}
+		else if (e.getSource() == menuItem_BianjiYonghu)
+		{
+			FrmBianjiYonghu dlg = new FrmBianjiYonghu(this, "编辑用户", true);
+			dlg.setVisible(true);
+		}
+		else if (e.getSource() == menuItem_ChaxunYonghu)
+		{
+			FrmChaxunYonghu dlg = new FrmChaxunYonghu(this, "查询用户", true);
+			dlg.setVisible(true);
+		}
+		else if (e.getSource() == menuItem_ZengjiaShengxianleibie)
+		{
+			FrmZengjiaShengxianleibie dlg = new FrmZengjiaShengxianleibie(this, "增加生鲜类别", true);
+			dlg.setVisible(true);
+		}
+		else if (e.getSource() == menuItem_ShanchuShengxianleibie)
+		{
+			FrmShanchuShengxianleibie dlg = new FrmShanchuShengxianleibie(this, "删除生鲜类别", true);
+			dlg.setVisible(true);
+		}
+		else if (e.getSource() == menuItem_BianjiShengxianleibie)
+		{
+			FrmBianjiShengxianleibie dlg = new FrmBianjiShengxianleibie(this, "编辑生鲜类别", true);
+			dlg.setVisible(true);
+		}
+		else if (e.getSource() == menuItem_ChaxunShengxianleibie)
+		{
+			FrmChaxunShengxianleibie dlg = new FrmChaxunShengxianleibie(this, "查询生鲜类别", true);
+			dlg.setVisible(true);
+		}
 	}
 	
 	public FrmMain()
 	{
 		this.setExtendedState(Frame.MAXIMIZED_BOTH);
-		this.setTitle("个人计划管理系统");
+		this.setTitle("管理员管理系统");
 		FrmLogin dlgLogin=null;
 		dlgLogin = new FrmLogin(this,"登陆",true);
 		dlgLogin.setVisible(true);

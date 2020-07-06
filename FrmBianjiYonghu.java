@@ -5,27 +5,22 @@ import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 
-import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
 import model.BeanGuanliyuan;
 import starter.Util;
 import util.BaseException;
 
-public class FrmZengjiaYonghu extends JDialog implements ActionListener {
+public class FrmBianjiYonghu extends JDialog implements ActionListener{
 	private JPanel toolBar = new JPanel();
 	private JPanel workPane = new JPanel();
-	private JButton btn = new JButton("增加");
+	private JButton btn = new JButton("更新");
 	private JLabel label1 = new JLabel("用户编号：");
 	private JLabel label2 = new JLabel("姓名：");
 	private JLabel label3 = new JLabel("性别：");
@@ -45,8 +40,7 @@ public class FrmZengjiaYonghu extends JDialog implements ActionListener {
 	private JTextField edt9 = new JTextField(20);
 	private JTextField edt10 = new JTextField(20);
 	
-	
-	public FrmZengjiaYonghu(FrmMain f, String s, boolean b) {
+	public FrmBianjiYonghu(FrmMain f, String s, boolean b) {
 		// TODO Auto-generated constructor stub
 		super(f,s,b);
 		toolBar.setLayout(new FlowLayout(FlowLayout.RIGHT));
@@ -81,10 +75,8 @@ public class FrmZengjiaYonghu extends JDialog implements ActionListener {
 		this.validate();
 		btn.addActionListener(this);
 		
-	}
-
-
-	@Override
+		}
+	
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
 		if (e.getSource() == this.btn)
@@ -99,13 +91,12 @@ public class FrmZengjiaYonghu extends JDialog implements ActionListener {
 			String shifouhuiyuan =  new String(this.edt9.getText());
 			String huiyuanjiezhishijian = new String(this.edt10.getText());
 			try {
-				BeanGuanliyuan.currentLoginGuanliyuan = Util.guanliyuanManager.ZengjiaYonghu(yonghubianhao, xingming, xingbie, mima, shoujihaoma, youxiang, suozaichengshi, shifouhuiyuan, huiyuanjiezhishijian);
+				BeanGuanliyuan.currentLoginGuanliyuan = Util.guanliyuanManager.BianjiYonghu(yonghubianhao, xingming, xingbie, mima, shoujihaoma, youxiang, suozaichengshi, shifouhuiyuan, huiyuanjiezhishijian);
 			}catch (BaseException e1) {
 				JOptionPane.showMessageDialog(null, e1.getMessage(), "错误",JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 			this.setVisible(false);
 		}
-	}
-
+   }
 }
