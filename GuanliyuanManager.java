@@ -430,7 +430,7 @@ public class GuanliyuanManager implements IGuanliyuanManager{
 				throw new BusinessException("查询用户编号和姓名不能同时为空");
 			}
 			conn = DBUtil.getConnection();
-			if (flag1 == 1 && flag1 == 0)
+			if (flag1 == 1 && flag2 == 0)
 			{
 			String sql="select yonghubianhao,xingming,xingbie,mima,shoujihaoma,youxiang,suozaichengshi,zhuceshijian,shifouhuiyuan,huiyuanjiezhishijian from yonghu where yonghubianhao = ?";
 			java.sql.PreparedStatement pst=conn.prepareStatement(sql);
@@ -736,12 +736,34 @@ public class GuanliyuanManager implements IGuanliyuanManager{
 			{
 				throw new BusinessException("类别编号");
 			}
+			if (Double.valueOf(huiyuanjia) > Double.valueOf(jiage))
+			{
+				throw new BusinessException("会员价大于平时价格");
+			}
             conn = DBUtil.getConnection();
-            String sql="select yonghubianhao,xingming,xingbie,mima,shoujihaoma,youxiang,suozaichengshi,zhuceshijian,shifouhuiyuan,huiyuanjiezhishijian from yonghu where yonghubianhao = ?";
+            String sql="select leibiebianhao from shangpin where shangpinbianhao = ?";
 			java.sql.PreparedStatement pst=conn.prepareStatement(sql);
-			pst.setInt(1,Integer.valueOf(yonghubianhao));
+			pst.setInt(1,Integer.valueOf(shangpinbianhao));
 			java.sql.ResultSet rs=pst.executeQuery();
-			if(!rs.next()) throw new BusinessException("查询用户不存在");
+			if(rs.next()) throw new BusinessException("商品编号已存在");
+			sql = "select leibiemingcheng from shengxianleibie where leibiebianhao = ?";
+			pst = conn.prepareStatement(sql);
+			pst.setInt(1, Integer.valueOf(leibiebianhao));
+			rs = pst.executeQuery();
+			if (!rs.next()) throw new BusinessException("类别编号不存在");
+			sql = "insert into shangpin(shangpinbianhao,shangpinmingcheng,jiage,huiyuanjia,shuliang,guige,xiangqing,leibiebianhao) values(?,?,?,?,?,?,?,?)";
+			pst = conn.prepareStatement(sql);
+			pst.setInt(1, Integer.valueOf(shangpinbianhao));
+			pst.setString(2, shangpinmingcheng);
+			pst.setDouble(3, Double.valueOf(jiage));
+			pst.setDouble(4, Double.valueOf(huiyuanjia));
+			pst.setDouble(5, Double.valueOf(shuliang));
+			pst.setString(6, guige);
+			pst.setString(7, xiangqing);
+			pst.setInt(8, Integer.valueOf(leibiebianhao));
+			pst.execute();
+			JOptionPane.showMessageDialog(null,"增加成功", "结果",JOptionPane.PLAIN_MESSAGE);
+			return BeanGuanliyuan.currentLoginGuanliyuan;
         } catch (SQLException e) {
 			e.printStackTrace();
 			throw new DbException(e);
@@ -755,5 +777,793 @@ public class GuanliyuanManager implements IGuanliyuanManager{
 					e.printStackTrace();
 				}
 		}
+	}
+	
+	public BeanGuanliyuan ShanchuShangpin(String shangpinbianhao, String shangpinmingcheng)throws BaseException
+	{
+		Connection conn=null;
+		try {
+			if (shangpinbianhao == null || "".equals(shangpinbianhao))
+			{
+				throw new BusinessException("商品编号不能为空");
+			}
+			if (shangpinmingcheng == null || "".equals(shangpinmingcheng))
+			{
+				throw new BusinessException("商品名称不能为空");
+			}
+            conn = DBUtil.getConnection();
+            String sql="select shangpinmingcheng from shangpin where shangpinbianhao = ? and shangpinmingcheng = ?";
+			java.sql.PreparedStatement pst=conn.prepareStatement(sql);
+			pst.setInt(1,Integer.valueOf(shangpinbianhao));
+			pst.setString(2, shangpinmingcheng);
+			java.sql.ResultSet rs=pst.executeQuery();
+			if(!rs.next()) throw new BusinessException("商品不存在");
+			sql = "select caipubianhao from shangpincaiputuijian where shangpinbianhao = ?";
+			pst = conn.prepareStatement(sql);
+			pst.setInt(1, Integer.valueOf(shangpinbianhao));
+			rs = pst.executeQuery();
+			if (rs.next()) throw new BusinessException("商品在商品菜谱推荐表中出现，不能删除");
+			sql = "select pingjiayonghubianhao from shangpinpingjia where shangpinbianhao = ?";
+			pst = conn.prepareStatement(sql);
+			pst.setInt(1, Integer.valueOf(shangpinbianhao));
+			rs = pst.executeQuery();
+			if (rs.next()) throw new BusinessException("商品在商品评价表中出现，不能删除");
+			sql = "select manzhebianhao from manzheshangpinguanlian where shangpinbianhao = ?";
+			pst = conn.prepareStatement(sql);
+			pst.setInt(1, Integer.valueOf(shangpinbianhao));
+			rs = pst.executeQuery();
+			if (rs.next()) throw new BusinessException("商品在满折商品关联表中出现，不能删除");
+			sql = "select cuxiaobianhao from xianshicuxiao where shangpinbianhao = ?";
+			pst = conn.prepareStatement(sql);
+			pst.setInt(1, Integer.valueOf(shangpinbianhao));
+			rs = pst.executeQuery();
+			if (rs.next()) throw new BusinessException("商品在限时促销表中出现，不能删除");
+			sql = "select dingdanbianhao from dingdanxiangqing where shangpinbianhao = ?";
+			pst = conn.prepareStatement(sql);
+			pst.setInt(1, Integer.valueOf(shangpinbianhao));
+			rs = pst.executeQuery();
+			if (rs.next()) throw new BusinessException("商品在订单详情表中出现，不能删除");
+			sql = "delete from shangpin where shangpinbianhao = ? and shangpinmingcheng = ?";
+			pst = conn.prepareStatement(sql);
+			pst.setInt(1, Integer.valueOf(shangpinbianhao));
+			pst.setString(2, shangpinmingcheng);
+			pst.execute();
+			JOptionPane.showMessageDialog(null,"删除成功", "结果",JOptionPane.PLAIN_MESSAGE);
+			return BeanGuanliyuan.currentLoginGuanliyuan;
+        } catch (SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}
+		finally{
+			if(conn!=null)
+				try {
+					conn.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		}
+	}
+	
+	public BeanGuanliyuan BianjiShangpin(String shangpinbianhao, String shangpinmingcheng, String jiage,String huiyuanjia, String shuliang , String guige, String xiangqing, String leibiebianhao)throws BaseException
+	{
+		Connection conn=null;
+		try {
+			if (shangpinbianhao == null || "".equals(shangpinbianhao))
+			{
+				throw new BusinessException("商品编号不能为空");
+			}
+			if (shangpinmingcheng == null || "".equals(shangpinmingcheng))
+			{
+				throw new BusinessException("商品名称不能为空");
+			}
+			if (jiage == null ||"".equals(jiage))
+			{
+				throw new BusinessException("价格不能为空");
+			}
+			if (huiyuanjia == null || "".equals(huiyuanjia))
+			{
+				throw new BusinessException("会员价不能为空");
+			}
+			if (shuliang == null || "".equals(shuliang))
+			{
+				throw new BusinessException("数量不能为空");
+			}
+			if (guige == null || "".equals(guige))
+			{
+				throw new BusinessException("规格不能为空");
+			}
+			if (xiangqing == null || "".equals(xiangqing))
+			{
+				throw new BusinessException("详情不能为空");
+			}
+			if (leibiebianhao == null || "".equals(leibiebianhao ))
+			{
+				throw new BusinessException("类别编号");
+			}
+			if (Double.valueOf(huiyuanjia) > Double.valueOf(jiage))
+			{
+				throw new BusinessException("会员价大于平时价格");
+			}
+            conn = DBUtil.getConnection();
+            String sql="select shangpinmingcheng from shangpin where shangpinbianhao = ?";
+			java.sql.PreparedStatement pst=conn.prepareStatement(sql);
+			pst.setInt(1,Integer.valueOf(shangpinbianhao));
+			java.sql.ResultSet rs=pst.executeQuery();
+			if(!rs.next()) throw new BusinessException("查询用户不存在");
+			sql = "select leibiemingcheng from shengxianleibie where leibiebianhao = ?";
+			pst = conn.prepareStatement(sql);
+			pst.setInt(1, Integer.valueOf(leibiebianhao));
+			rs = pst.executeQuery();
+			if (!rs.next()) throw new BusinessException("类别编号不存在");
+			sql = "update shangpin set shangpinmingcheng = ?,jiage = ?,huiyuanjia = ?,shuliang = ?,guige = ?,xiangqing = ?,leibiebianhao = ? where shangpinbianhao = ?";
+			pst = conn.prepareStatement(sql);
+			pst.setInt(8, Integer.valueOf(shangpinbianhao));
+			pst.setString(1, shangpinmingcheng);
+			pst.setDouble(2, Double.valueOf(jiage));
+			pst.setDouble(3, Double.valueOf(huiyuanjia));
+			pst.setDouble(4, Double.valueOf(shuliang));
+			pst.setString(5, guige);
+			pst.setString(6, xiangqing);
+			pst.setInt(7, Integer.valueOf(leibiebianhao));
+			pst.execute();
+			JOptionPane.showMessageDialog(null,"编辑成功", "结果",JOptionPane.PLAIN_MESSAGE);
+			return BeanGuanliyuan.currentLoginGuanliyuan;
+        } catch (SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}
+		finally{
+			if(conn!=null)
+				try {
+					conn.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		}
+	}
+	
+	public BeanGuanliyuan ChaxunShangpin(String shangpinbianhao, String shangpinmingcheng)throws BaseException
+	{
+		Connection conn=null;
+		try {
+			int flag1 = 0,flag2 = 0;
+			if (shangpinbianhao == null || "".equals(shangpinbianhao))
+			{
+				flag1 = 0;
+			}
+			else
+			{
+				flag1 = 1;
+			}
+			if (shangpinmingcheng == null || "".equals(shangpinmingcheng))
+			{
+				flag2 = 0;
+			}
+			else
+			{
+				flag2 = 1;
+			}
+			if (flag1 == 0 && flag2 == 0)
+			{
+				throw new BusinessException("查询商品编号和商品名称不能同时为空");
+			}
+			conn = DBUtil.getConnection();
+			if (flag1 == 1 && flag2 == 0)
+			{
+			String sql="select shangpinbianhao,shangpinmingcheng,jiage,huiyuanjia,shuliang,guige,xiangqing,leibiebianhao from shangpin where shangpinbianhao = ?";
+			java.sql.PreparedStatement pst=conn.prepareStatement(sql);
+			pst.setInt(1,Integer.valueOf(shangpinbianhao));
+			java.sql.ResultSet rs=pst.executeQuery();
+			if(!rs.next()) throw new BusinessException("查询商品不存在");
+			JOptionPane.showMessageDialog(null,"商品编号   "+"商品名称   "+"价格   "+"会员价   "+"数量   "+"规格   "+"详情   "+"类别编号\n"+rs.getInt(1)+"   "+rs.getString(2)+"   "+rs.getDouble(3)+"   "+rs.getDouble(4)+"   "+rs.getDouble(5)+"   "+rs.getString(6)+"   "+rs.getString(7)+"   "+rs.getInt(8),"查询结果",JOptionPane.PLAIN_MESSAGE);
+			return BeanGuanliyuan.currentLoginGuanliyuan;
+			}
+			else if(flag1 == 0 && flag2 == 1)
+			{
+				String resultString = "商品编号   "+"商品名称   "+"价格   "+"会员价   "+"数量   "+"规格   "+"详情   "+"类别编号\n";
+				String sql="select shangpinbianhao from shangpin where shangpinmingcheng = ?";
+				java.sql.PreparedStatement pst=conn.prepareStatement(sql);
+				pst.setString(1,shangpinmingcheng);
+				java.sql.ResultSet rs=pst.executeQuery();
+				if(!rs.next()) throw new BusinessException("查询用户不存在");
+				sql="select shangpinbianhao,shangpinmingcheng,jiage,huiyuanjia,shuliang,guige,xiangqing,leibiebianhao from shangpin where shangpinmingcheng = ? order by shangpinbianhao";
+				pst=conn.prepareStatement(sql);
+				pst.setString(1,shangpinmingcheng);
+				rs=pst.executeQuery();
+				while (rs.next())
+				{
+				resultString += rs.getInt(1)+"   "+rs.getString(2)+"   "+rs.getDouble(3)+"   "+rs.getDouble(4)+"   "+rs.getDouble(5)+"   "+rs.getString(6)+"   "+rs.getString(7)+"   "+rs.getInt(8)+"\n";
+				}
+				JOptionPane.showMessageDialog(null,resultString, "查询结果",JOptionPane.PLAIN_MESSAGE);
+				return BeanGuanliyuan.currentLoginGuanliyuan;
+			}
+			else if (flag1 == 1 && flag2 == 1)
+			{
+				String sql="select shangpinbianhao,shangpinmingcheng,jiage,huiyuanjia,shuliang,guige,xiangqing,leibiebianhao from shangpin where shangpinmingcheng = ? and shangpinbianhao = ?";
+				java.sql.PreparedStatement pst=conn.prepareStatement(sql);
+				pst.setInt(2,Integer.valueOf(shangpinbianhao));
+				pst.setString(1, shangpinmingcheng);
+				java.sql.ResultSet rs=pst.executeQuery();
+				if(!rs.next()) throw new BusinessException("查询用户不存在");
+				JOptionPane.showMessageDialog(null,"商品编号   "+"商品名称   "+"价格   "+"会员价   "+"数量   "+"规格   "+"详情   "+"类别编号\n"+rs.getInt(1)+"   "+rs.getString(2)+"   "+rs.getDouble(3)+"   "+rs.getDouble(4)+"   "+rs.getDouble(5)+"   "+rs.getString(6)+"   "+rs.getString(7)+"   "+rs.getInt(8), "查询结果",JOptionPane.PLAIN_MESSAGE);
+				return BeanGuanliyuan.currentLoginGuanliyuan;
+			}
+			return BeanGuanliyuan.currentLoginGuanliyuan;
+        } catch (SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}
+		finally{
+			if(conn!=null)
+				try {
+					conn.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		}
+	}
+	
+	public BeanGuanliyuan ZengjiaYouhuiquan(String youhuiquanbianhao, String neirong,String shiyongjine,String jianmianjine,String qishiriqi,String jiezhiriqi)throws BaseException
+	{
+		Connection conn=null;
+		try {
+			if (youhuiquanbianhao == null || "".equals(youhuiquanbianhao))
+			{
+				throw new BusinessException("优惠券编号不能为空");
+			}
+			if (neirong == null || "".equals(neirong))
+			{
+				throw new BusinessException("内容不能为空");
+			}
+			if (shiyongjine == null ||"".equals(shiyongjine))
+			{
+				throw new BusinessException("使用金额不能为空");
+			}
+			if (jianmianjine == null || "".equals(jianmianjine))
+			{
+				throw new BusinessException("减免金额不能为空");
+			}
+			if (qishiriqi == null || "".equals(qishiriqi))
+			{
+				throw new BusinessException("起始日期不能为空");
+			}
+			if (jiezhiriqi == null || "".equals(jiezhiriqi))
+			{
+				throw new BusinessException("截止日期不能为空");
+			}
+			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			Timestamp time1,time2;
+			try {
+				time1 = new Timestamp(format.parse(qishiriqi).getTime());
+			} catch (ParseException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+				throw new BusinessException("起始日期时间格式错误");
+			}
+			try {
+				time2 = new Timestamp(format.parse(jiezhiriqi).getTime());
+			} catch (ParseException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+				throw new BusinessException("截止日期时间格式错误");
+			}
+			if (time1.getTime() > time2.getTime())
+			{
+				throw new BusinessException("起始日期晚于截止日期");
+			}
+			if (Double.valueOf(shiyongjine) < Double.valueOf(jianmianjine))
+			{
+				throw new BusinessException("减免金额大于使用金额");
+			}
+            conn = DBUtil.getConnection();
+            String sql="select neirong from youhuiquan where youhuiquanbianhao = ?";
+			java.sql.PreparedStatement pst=conn.prepareStatement(sql);
+			pst.setInt(1,Integer.valueOf(youhuiquanbianhao));
+			java.sql.ResultSet rs=pst.executeQuery();
+			if(rs.next()) throw new BusinessException("优惠券编号已存在");
+			sql = "insert into youhuiquan(youhuiquanbianhao,neirong,shiyongjine,jianmianjine,qishiriqi,jieshuriqi) values(?,?,?,?,?,?)";
+			pst = conn.prepareStatement(sql);
+			pst.setInt(1, Integer.valueOf(youhuiquanbianhao));
+			pst.setString(2, neirong);
+			pst.setDouble(3, Double.valueOf(shiyongjine));
+			pst.setDouble(4, Double.valueOf(jianmianjine));
+			pst.setTimestamp(5, time1);
+			pst.setTimestamp(6, time2);
+			pst.execute();
+			JOptionPane.showMessageDialog(null,"增加成功", "结果",JOptionPane.PLAIN_MESSAGE);
+			return BeanGuanliyuan.currentLoginGuanliyuan;
+        } catch (SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}
+		finally{
+			if(conn!=null)
+				try {
+					conn.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		}
+	}
+	
+	public BeanGuanliyuan ShanchuYouhuiquan(String youhuiquanbianhao)throws BaseException
+	{
+		Connection conn=null;
+		try {
+			if (youhuiquanbianhao == null || "".equals(youhuiquanbianhao))
+			{
+				throw new BusinessException("优惠券编号不能为空");
+			}
+            conn = DBUtil.getConnection();
+            String sql="select neirong from youhuiquan where youhuiquanbianhao = ?";
+			java.sql.PreparedStatement pst=conn.prepareStatement(sql);
+			pst.setInt(1,Integer.valueOf(youhuiquanbianhao));
+			java.sql.ResultSet rs=pst.executeQuery();
+			if(!rs.next()) throw new BusinessException("优惠券不存在");
+			sql="select dingdanbianhao from shangpindingdan where shiyongyouhuiquanbianhao = ?";
+			pst=conn.prepareStatement(sql);
+			pst.setInt(1,Integer.valueOf(youhuiquanbianhao));
+			rs=pst.executeQuery();
+			if(rs.next()) throw new BusinessException("优惠券在商品订单表中出现，不能删除");
+			sql="delete from youhuiquan where youhuiquanbianhao = ?";
+			pst=conn.prepareStatement(sql);
+			pst.setInt(1,Integer.valueOf(youhuiquanbianhao));
+			pst.execute();
+			JOptionPane.showMessageDialog(null,"删除成功", "结果",JOptionPane.PLAIN_MESSAGE);
+			return BeanGuanliyuan.currentLoginGuanliyuan;
+        } catch (SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}
+		finally{
+			if(conn!=null)
+				try {
+					conn.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		}
+	}
+	
+	public BeanGuanliyuan BianjiYouhuiquan(String youhuiquanbianhao, String neirong,String shiyongjine,String jianmianjine,String qishiriqi,String jieshuriqi)throws BaseException
+	{
+		Connection conn=null;
+		try {
+			if (youhuiquanbianhao == null || "".equals(youhuiquanbianhao))
+			{
+				throw new BusinessException("优惠券编号不能为空");
+			}
+			if (neirong == null || "".equals(neirong))
+			{
+				throw new BusinessException("内容不能为空");
+			}
+			if (shiyongjine == null ||"".equals(shiyongjine))
+			{
+				throw new BusinessException("使用金额不能为空");
+			}
+			if (jianmianjine == null || "".equals(jianmianjine))
+			{
+				throw new BusinessException("减免金额不能为空");
+			}
+			if (qishiriqi == null || "".equals(qishiriqi))
+			{
+				throw new BusinessException("起始日期不能为空");
+			}
+			if (jieshuriqi == null || "".equals(jieshuriqi))
+			{
+				throw new BusinessException("截止日期不能为空");
+			}
+			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			Timestamp time1,time2;
+			try {
+				time1 = new Timestamp(format.parse(qishiriqi).getTime());
+			} catch (ParseException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+				throw new BusinessException("起始日期时间格式错误");
+			}
+			try {
+				time2 = new Timestamp(format.parse(jieshuriqi).getTime());
+			} catch (ParseException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+				throw new BusinessException("截止日期时间格式错误");
+			}
+			if (time1.getTime() > time2.getTime())
+			{
+				throw new BusinessException("起始日期晚于截止日期");
+			}
+			if (Double.valueOf(shiyongjine) < Double.valueOf(jianmianjine))
+			{
+				throw new BusinessException("减免金额大于使用金额");
+			}
+            conn = DBUtil.getConnection();
+            String sql="select neirong from youhuiquan where youhuiquanbianhao = ?";
+			java.sql.PreparedStatement pst=conn.prepareStatement(sql);
+			pst.setInt(1,Integer.valueOf(youhuiquanbianhao));
+			java.sql.ResultSet rs=pst.executeQuery();
+			if(!rs.next()) throw new BusinessException("优惠券编号不存在");
+			sql = "update youhuiquan set neirong = ?,shiyongjine = ?,jianmianjine = ?,qishiriqi = ?,jieshuriqi = ? where youhuiquanbianhao = ?";
+			pst = conn.prepareStatement(sql);
+			pst.setInt(6, Integer.valueOf(youhuiquanbianhao));
+			pst.setString(1, neirong);
+			pst.setDouble(2, Double.valueOf(shiyongjine));
+			pst.setDouble(3, Double.valueOf(jianmianjine));
+			pst.setTimestamp(4, time1);
+			pst.setTimestamp(5, time2);
+			pst.execute();
+			JOptionPane.showMessageDialog(null,"编辑成功", "结果",JOptionPane.PLAIN_MESSAGE);
+			return BeanGuanliyuan.currentLoginGuanliyuan;
+        } catch (SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}
+		finally{
+			if(conn!=null)
+				try {
+					conn.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		}
+	}
+	
+	public BeanGuanliyuan ChaxunYouhuiquan(String youhuiquanbianhao)throws BaseException
+	{
+		Connection conn=null;
+		try {
+		if (youhuiquanbianhao == null || "".equals(youhuiquanbianhao))
+		{
+			throw new BusinessException("查询优惠券编号不能为空");
+		}
+		conn = DBUtil.getConnection();
+		String sql="select youhuiquanbianhao,neirong,shiyongjine,jianmianjine,qishiriqi,jieshuriqi from youhuiquan where youhuiquanbianhao = ?";
+		java.sql.PreparedStatement pst=conn.prepareStatement(sql);
+		pst.setInt(1,Integer.valueOf(youhuiquanbianhao));
+		java.sql.ResultSet rs=pst.executeQuery();
+		if(!rs.next()) throw new BusinessException("查询优惠券不存在");
+		JOptionPane.showMessageDialog(null,"优惠券编号   "+"内容   "+"使用金额   "+"减免金额   "+"起始日期   "+"结束日期\n"+rs.getInt(1)+"   "+rs.getString(2)+"   "+rs.getDouble(3)+"   "+rs.getDouble(4)+"   "+rs.getTimestamp(5)+"   "+rs.getTimestamp(6),"查询结果",JOptionPane.PLAIN_MESSAGE);
+		return BeanGuanliyuan.currentLoginGuanliyuan;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}
+		finally{
+			if(conn!=null)
+				try {
+					conn.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		}
+	}
+	
+	public BeanGuanliyuan ZengjiaManzhe(String manzhebianhao, String neirong,String shiyongshangpinshuliang,String zhekou,String qishiriqi,String jieshuriqi)throws BaseException
+	{
+		Connection conn=null;
+		try {
+		if (manzhebianhao == null || "".equals(manzhebianhao))
+		{
+			throw new BusinessException("满折编号不能为空");
+		}
+		if (neirong == null || "".equals(neirong))
+		{
+			throw new BusinessException("内容不能为空");
+		}
+		if (shiyongshangpinshuliang == null || "".equals(shiyongshangpinshuliang))
+		{
+			throw new BusinessException("适用商品数量不能为空");
+		}
+		if (zhekou == null || "".equals(zhekou))
+		{
+			throw new BusinessException("折扣不能为空");
+		}
+		if (qishiriqi == null || "".equals(qishiriqi))
+		{
+			throw new BusinessException("起始日期不能为空");
+		}
+		if (jieshuriqi == null || "".equals(jieshuriqi))
+		{
+			throw new BusinessException("结束日期不能为空");
+		}
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		Timestamp time1,time2;
+		try {
+			time1 = new Timestamp(format.parse(qishiriqi).getTime());
+		} catch (ParseException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			throw new BusinessException("起始日期时间格式错误");
+		}
+		try {
+			time2 = new Timestamp(format.parse(jieshuriqi).getTime());
+		} catch (ParseException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			throw new BusinessException("结束日期时间格式错误");
+		}
+		if (time1.getTime() > time2.getTime())
+		{
+			throw new BusinessException("起始日期晚于结束日期");
+		}
+		if (Double.valueOf(zhekou) > 1)
+		{
+			throw new BusinessException("折扣大于1");
+		}
+		conn = DBUtil.getConnection();
+        String sql="select neirong from manzhe where manzhebianhao = ?";
+		java.sql.PreparedStatement pst=conn.prepareStatement(sql);
+		pst.setInt(1,Integer.valueOf(manzhebianhao));
+		java.sql.ResultSet rs=pst.executeQuery();
+		if(rs.next()) throw new BusinessException("满折编号已存在");
+		sql = "insert manzhe(manzhebianhao,neirong,shiyongshangpinshuliang,zhekou,qishiriqi,jieshuriqi)values(?,?,?,?,?,?)";
+		pst = conn.prepareStatement(sql);
+		pst.setInt(1, Integer.valueOf(manzhebianhao));
+		pst.setString(2, neirong);
+		pst.setDouble(3, Double.valueOf(shiyongshangpinshuliang));
+		pst.setDouble(4, Double.valueOf(zhekou));
+		pst.setTimestamp(5, time1);
+		pst.setTimestamp(6, time2);
+		pst.execute();
+		JOptionPane.showMessageDialog(null,"增加成功", "结果",JOptionPane.PLAIN_MESSAGE);
+		return BeanGuanliyuan.currentLoginGuanliyuan;
+	}catch (SQLException e) {
+		e.printStackTrace();
+		throw new DbException(e);
+	}
+	finally{
+		if(conn!=null)
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	}
+  }
+	
+	public BeanGuanliyuan ShanchuManzhe(String manzhebianhao)throws BaseException
+	{
+		Connection conn=null;
+		try {
+			if (manzhebianhao == null || "".equals(manzhebianhao))
+			{
+				throw new BusinessException("满折编号不能为空");
+			}
+            conn = DBUtil.getConnection();
+            String sql="select neirong from manzhe where manzhebianhao = ?";
+			java.sql.PreparedStatement pst=conn.prepareStatement(sql);
+			pst.setInt(1,Integer.valueOf(manzhebianhao));
+			java.sql.ResultSet rs=pst.executeQuery();
+			if(!rs.next()) throw new BusinessException("满折不存在");
+			sql="select shangpinbianhao from manzheshangpinguanlian where manzhebianhao = ?";
+			pst=conn.prepareStatement(sql);
+			pst.setInt(1,Integer.valueOf(manzhebianhao));
+			rs=pst.executeQuery();
+			if(rs.next()) throw new BusinessException("满折在满折商品关联表中出现，不能删除");
+			sql="delete from manzhe where manzhebianhao = ?";
+			pst=conn.prepareStatement(sql);
+			pst.setInt(1,Integer.valueOf(manzhebianhao));
+			pst.execute();
+			JOptionPane.showMessageDialog(null,"删除成功", "结果",JOptionPane.PLAIN_MESSAGE);
+			return BeanGuanliyuan.currentLoginGuanliyuan;
+        } catch (SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}
+		finally{
+			if(conn!=null)
+				try {
+					conn.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		}
+	}
+	
+	public BeanGuanliyuan BianjiManzhe(String manzhebianhao, String neirong,String shiyongshangpinshuliang,String zhekou,String qishiriqi,String jieshuriqi)throws BaseException
+	{
+		Connection conn=null;
+		try {
+		if (manzhebianhao == null || "".equals(manzhebianhao))
+		{
+			throw new BusinessException("满折编号不能为空");
+		}
+		if (neirong == null || "".equals(neirong))
+		{
+			throw new BusinessException("内容不能为空");
+		}
+		if (shiyongshangpinshuliang == null || "".equals(shiyongshangpinshuliang))
+		{
+			throw new BusinessException("适用商品数量不能为空");
+		}
+		if (zhekou == null || "".equals(zhekou))
+		{
+			throw new BusinessException("折扣不能为空");
+		}
+		if (qishiriqi == null || "".equals(qishiriqi))
+		{
+			throw new BusinessException("起始日期不能为空");
+		}
+		if (jieshuriqi == null || "".equals(jieshuriqi))
+		{
+			throw new BusinessException("结束日期不能为空");
+		}
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		Timestamp time1,time2;
+		try {
+			time1 = new Timestamp(format.parse(qishiriqi).getTime());
+		} catch (ParseException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			throw new BusinessException("起始日期时间格式错误");
+		}
+		try {
+			time2 = new Timestamp(format.parse(jieshuriqi).getTime());
+		} catch (ParseException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			throw new BusinessException("结束日期时间格式错误");
+		}
+		if (time1.getTime() > time2.getTime())
+		{
+			throw new BusinessException("起始日期晚于结束日期");
+		}
+		if (Double.valueOf(zhekou) > 1)
+		{
+			throw new BusinessException("折扣大于1");
+		}
+		conn = DBUtil.getConnection();
+        String sql="select neirong from manzhe where manzhebianhao = ?";
+		java.sql.PreparedStatement pst=conn.prepareStatement(sql);
+		pst.setInt(1,Integer.valueOf(manzhebianhao));
+		java.sql.ResultSet rs=pst.executeQuery();
+		if(!rs.next()) throw new BusinessException("满折编号不存在");
+		sql = "update manzhe set neirong = ?,shiyongshangpinshuliang = ?,zhekou = ?,qishiriqi = ?,jieshuriqi = ? where manzhebianhao = ?";
+		pst = conn.prepareStatement(sql);
+		pst.setInt(6, Integer.valueOf(manzhebianhao));
+		pst.setString(1, neirong);
+		pst.setDouble(2, Double.valueOf(shiyongshangpinshuliang));
+		pst.setDouble(3, Double.valueOf(zhekou));
+		pst.setTimestamp(4, time1);
+		pst.setTimestamp(5, time2);
+		pst.execute();
+		JOptionPane.showMessageDialog(null,"编辑成功", "结果",JOptionPane.PLAIN_MESSAGE);
+		return BeanGuanliyuan.currentLoginGuanliyuan;
+	}catch (SQLException e) {
+		e.printStackTrace();
+		throw new DbException(e);
+	}
+	finally{
+		if(conn!=null)
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	}
+	}
+	
+	public BeanGuanliyuan ChaxunManzhe(String manzhebianhao)throws BaseException
+	{
+		Connection conn=null;
+		try {
+		if (manzhebianhao == null || "".equals(manzhebianhao))
+		{
+			throw new BusinessException("查询满折编号不能为空");
+		}
+		conn = DBUtil.getConnection();
+		String sql="select manzhebianhao,neirong,shiyongshangpinshuliang,zhekou,qishiriqi,jieshuriqi from manzhe where manzhebianhao = ?";
+		java.sql.PreparedStatement pst=conn.prepareStatement(sql);
+		pst.setInt(1,Integer.valueOf(manzhebianhao));
+		java.sql.ResultSet rs=pst.executeQuery();
+		if(!rs.next()) throw new BusinessException("查询满折不存在");
+		JOptionPane.showMessageDialog(null,"满折编号   "+"内容   "+"使用商品数量   "+"折扣   "+"起始日期   "+"结束日期\n"+rs.getInt(1)+"   "+rs.getString(2)+"   "+rs.getDouble(3)+"   "+rs.getDouble(4)+"   "+rs.getTimestamp(5)+"   "+rs.getTimestamp(6),"查询结果",JOptionPane.PLAIN_MESSAGE);
+		return BeanGuanliyuan.currentLoginGuanliyuan;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}
+		finally{
+			if(conn!=null)
+				try {
+					conn.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		}
+	}
+	
+	public BeanGuanliyuan ZengjiaXianshicuxiao(String cuxiaobianhao, String shangpinbianhao,String cuxiaojiage,String cuxiaoshuliang,String qishiriqi,String jieshuriqi)throws BaseException
+	{
+		Connection conn=null;
+		try {
+		if (cuxiaobianhao == null || "".equals(cuxiaobianhao))
+		{
+			throw new BusinessException("促销编号不能为空");
+		}
+		if (shangpinbianhao == null || "".equals(shangpinbianhao))
+		{
+			throw new BusinessException("内容不能为空");
+		}
+		if (cuxiaojiage == null || "".equals(cuxiaojiage))
+		{
+			throw new BusinessException("促销价格不能为空");
+		}
+		if (cuxiaoshuliang == null || "".equals(cuxiaoshuliang))
+		{
+			throw new BusinessException("促销数量不能为空");
+		}
+		if (qishiriqi == null || "".equals(qishiriqi))
+		{
+			throw new BusinessException("起始日期不能为空");
+		}
+		if (jieshuriqi == null || "".equals(jieshuriqi))
+		{
+			throw new BusinessException("结束日期不能为空");
+		}
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		Timestamp time1,time2;
+		try {
+			time1 = new Timestamp(format.parse(qishiriqi).getTime());
+		} catch (ParseException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			throw new BusinessException("起始日期时间格式错误");
+		}
+		try {
+			time2 = new Timestamp(format.parse(jieshuriqi).getTime());
+		} catch (ParseException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			throw new BusinessException("结束日期时间格式错误");
+		}
+		if (time1.getTime() > time2.getTime())
+		{
+			throw new BusinessException("起始日期晚于结束日期");
+		}
+		conn = DBUtil.getConnection();
+        String sql="select shangpinbianhao from xianshicuxiao where cuxiaobianhao = ?";
+		java.sql.PreparedStatement pst=conn.prepareStatement(sql);
+		pst.setInt(1,Integer.valueOf(cuxiaobianhao));
+		java.sql.ResultSet rs=pst.executeQuery();
+		if(rs.next()) throw new BusinessException("促销编号已存在");
+		sql = "select shangpinmingcheng from shangpin where shangpinbianhao = ?";
+		pst = conn.prepareStatement(sql);
+		pst.set
+		sql = "insert into xianshicuxiao(cuxiaobianhao,shangpinbianhao,cuxiaojiage,cuxiaoshuliang,qishiriqi,jieshuriqi) values(?,?,?,?,?,?)";
+		pst = conn.prepareStatement(sql);
+		pst.setInt(1, Integer.valueOf(cuxiaobianhao));
+		pst.setString(2, shangpinbianhao);
+		pst.setDouble(3, Double.valueOf(cuxiaojiage));
+		pst.setDouble(4, Double.valueOf(cuxiaoshuliang));
+		pst.setTimestamp(5, time1);
+		pst.setTimestamp(6, time2);
+		pst.execute();
+		JOptionPane.showMessageDialog(null,"增加成功", "结果",JOptionPane.PLAIN_MESSAGE);
+		return BeanGuanliyuan.currentLoginGuanliyuan;
+	}catch (SQLException e) {
+		e.printStackTrace();
+		throw new DbException(e);
+	}
+	finally{
+		if(conn!=null)
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	}
 	}
 }

@@ -101,6 +101,71 @@ public class FrmMain extends JFrame implements ActionListener{
 			FrmChaxunShengxianleibie dlg = new FrmChaxunShengxianleibie(this, "查询生鲜类别", true);
 			dlg.setVisible(true);
 		}
+		else if (e.getSource() == menuItem_ZengjiaShangpin)
+		{
+			FrmZengjiaShangpin dlg = new FrmZengjiaShangpin(this, "增加商品", true);
+			dlg.setVisible(true);
+		}
+		else if (e.getSource() == menuItem_ShanchuShangpin)
+		{
+			FrmShanchuShangpin dlg = new FrmShanchuShangpin(this, "删除商品", true);
+			dlg.setVisible(true);
+		}
+		else if (e.getSource() == menuItem_BianjiShangpin)
+		{
+			FrmBianjiShangpin dlg = new FrmBianjiShangpin(this, "编辑商品", true);
+			dlg.setVisible(true);
+		}
+		else if (e.getSource() == menuItem_ChaxunShangpin)
+		{
+			FrmChaxunShangpin dlg = new FrmChaxunShangpin(this, "查询商品", true);
+			dlg.setVisible(true);
+		}
+		else if (e.getSource() == menuItem_ZengjiaYouhuiquan)
+		{
+			FrmZengjiaYouhuiquan dlg = new FrmZengjiaYouhuiquan(this, "增加优惠券", true);
+			dlg.setVisible(true);
+		}
+		else if (e.getSource() == menuItem_ShanchuYouhuiquan)
+		{
+			FrmShanchuYouhuiquan dlg = new FrmShanchuYouhuiquan(this, "删除优惠券", true);
+			dlg.setVisible(true);
+		}
+		else if (e.getSource() == menuItem_BianjiYouhuiquan)
+		{
+			FrmBianjiYouhuiquan dlg = new FrmBianjiYouhuiquan(this, "编辑优惠券", true);
+			dlg.setVisible(true);
+		}
+		else if (e.getSource() == menuItem_ChaxunYouhuiquan)
+		{
+			FrmChaxunYouhuiquan dlg = new FrmChaxunYouhuiquan(this, "查询优惠券", true);
+			dlg.setVisible(true);
+		}
+		else if (e.getSource() == menuItem_ZengjiaManzhe)
+		{
+			FrmZengjiaManzhe dlg = new FrmZengjiaManzhe(this, "增加满折", true);
+			dlg.setVisible(true);
+		}
+		else if (e.getSource() == menuItem_ShanchuManzhe)
+		{
+			FrmShanchuManzhe dlg = new FrmShanchuManzhe(this, "删除满折", true);
+			dlg.setVisible(true);
+		}
+		else if (e.getSource() == menuItem_BianjiManzhe)
+		{
+			FrmBianjiManzhe dlg = new FrmBianjiManzhe(this, "编辑满折", true);
+			dlg.setVisible(true);
+		}
+		else if (e.getSource() == menuItem_ChaxunManzhe)
+		{
+			FrmChaxunManzhe dlg = new FrmChaxunManzhe(this, "查询满折", true);
+			dlg.setVisible(true);
+		}
+		else if (e.getSource() == menuItem_ZengjiaXianshicuxiao)
+		{
+			FrmZengjiaXianshicuxiao dlg = new FrmZengjiaXianshicuxiao(this, "增加限时促销", true);
+			dlg.setVisible(true);
+		}
 	}
 	
 	public FrmMain()
