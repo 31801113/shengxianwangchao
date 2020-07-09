@@ -8,7 +8,7 @@ public interface IGuanliyuanManager {
 	
 	public BeanGuanliyuan login(String yuangongbianhao, String denglumima) throws BaseException;
 	
-	public void changePwd(BeanGuanliyuan user, String olddenglumima, String newdenglumima,
+	public BeanGuanliyuan changePwd(BeanGuanliyuan user, String olddenglumima, String newdenglumima,
 			String newdenglumima2) throws BaseException;
 	
 	public BeanGuanliyuan ZengjiaYonghu(String yonghubianhao, String xingming, String xingbie,String mima,String shoujihaoma,String youxiang,String suozaichengshi,String shifouhuiyuan,String huiyuanjiezhishijian) throws BaseException;
@@ -52,4 +52,26 @@ public interface IGuanliyuanManager {
 	public BeanGuanliyuan ChaxunManzhe(String manzhebianhao)throws BaseException;
 	
 	public BeanGuanliyuan ZengjiaXianshicuxiao(String cuxiaobianhao, String shangpinbianhao,String cuxiaojiage,String cuxiaoshuliang,String qishiriqi,String jieshuriqi)throws BaseException;
+	
+	public BeanGuanliyuan ShanchuXianshicuxiao(String cuxiaobianhao, String shangpinbianhao)throws BaseException;
+	
+	public BeanGuanliyuan BianjiXianshicuxiao(String cuxiaobianhao, String shangpinbianhao,String cuxiaojiage,String cuxiaoshuliang,String qishiriqi,String jieshuriqi)throws BaseException;
+	
+	public BeanGuanliyuan ChaxunXianshicuxiao(String cuxiaobianhao, String shangpinbianhao)throws BaseException;
+	
+	public BeanGuanliyuan ZengjiaCaipu(String caipubianhao,String caipumingcheng,String caipuyongliao,String buzhou,String tupian)throws BaseException;
+	
+	public BeanGuanliyuan ShanchuCaipu(String caipubianhao,String caipumingcheng)throws BaseException;
+	
+	public BeanGuanliyuan BainjiCaipu(String caipubianhao,String caipumingcheng,String caipuyongliao,String buzhou,String tupian)throws BaseException;
+	
+	public BeanGuanliyuan ChaxunCaipu(String caipubianhao,String caipumingcheng)throws BaseException;
+	
+	public BeanGuanliyuan ZengjiaCaigou(String caigoudanbianhao,String shicaibianhao,String shuliang,String zhuangtai)throws BaseException;
+	
+	public BeanGuanliyuan ShanchuCaigou(String caigoudanbianhao,String shicaibianhao)throws BaseException;
+	
+	public BeanGuanliyuan BianjiCaigou(String caigoudanbianhao,String shicaibianhao,String shuliang,String zhuangtai)throws BaseException;
+	
+	public BeanGuanliyuan ChaxunCaigou(String caigoudanbianhao,String shicaibianhao)throws BaseException;
 }

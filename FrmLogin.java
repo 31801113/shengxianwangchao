@@ -8,7 +8,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.FormatFlagsConversionMismatchException;
+import java.util.function.Predicate;
 
+import javax.security.auth.login.FailedLoginException;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -18,8 +21,10 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
+import javax.swing.event.ChangeListener;
 
 import model.BeanGuanliyuan;
+import model.BeanYonghu;
 import starter.Util;
 import util.BaseException;
 
@@ -36,10 +41,12 @@ public class FrmLogin extends JDialog implements ActionListener {
 	private JLabel labelPwd = new JLabel("ÃÜÂë£º");
 	private JTextField edtUserId = new JTextField(20);
 	private JPasswordField edtPwd = new JPasswordField(20);
-
+	public int flag1 = 1;
 	public FrmLogin(Frame f, String s, boolean b) {
 		super(f, s, b);
 		toolBar.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		radioBtn01.setEnabled(true);
+		radioBtn02.setEnabled(true);
 		toolBar.add(this.btnRegister);
 		toolBar.add(btnLogin);
 		toolBar.add(btnCancel);
@@ -66,16 +73,22 @@ public class FrmLogin extends JDialog implements ActionListener {
 		btnLogin.addActionListener(this);
 		btnCancel.addActionListener(this);
 		this.btnRegister.addActionListener(this);
+		
+		
 		this.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
 				System.exit(0);
 			}
 		});
 	}
+	public int getflag()
+	{
+		return this.flag1;
+	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if (e.getSource() == this.btnLogin) {
+		if (e.getSource() == this.btnLogin && radioBtn01.isSelected()) {
 			String yuangongbianhao=new String(this.edtUserId.getText());
 			String denglumima=new String(this.edtPwd.getPassword());
 			try {
@@ -88,9 +101,27 @@ public class FrmLogin extends JDialog implements ActionListener {
 			
 		} else if (e.getSource() == this.btnCancel) {
 			System.exit(0);
-		} else if(e.getSource()==this.btnRegister){
+		} else if(e.getSource()==this.btnRegister && radioBtn01.isSelected()){
 			FrmRegister dlg=new FrmRegister(this,"×¢²á",true);
 			dlg.setVisible(true);
+		}else if (e.getSource() == this.btnLogin && radioBtn02.isSelected()) {
+			flag1 = 0;
+			String yonghubianhao=new String(this.edtUserId.getText());
+			String mima=new String(this.edtPwd.getPassword());
+			try {
+				BeanYonghu.currentLoginYonghu= Util.yonghuManager.login(yonghubianhao, mima);
+				FrmYonghuMain dlg = new FrmYonghuMain();
+				dlg.setVisible(true);
+			} catch (BaseException e1) {
+				JOptionPane.showMessageDialog(null, e1.getMessage(), "´íÎó",JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			this.setVisible(false);
+	     }
+		else if(e.getSource()==this.btnRegister && radioBtn02.isSelected()){
+			FrmYonghuRegister dlg=new FrmYonghuRegister(this,"×¢²á",true);
+			dlg.setVisible(true);
 		}
-	}
+		
+         }
 }

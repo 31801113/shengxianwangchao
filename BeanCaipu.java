@@ -1,6 +1,15 @@
 package model;
 
 public class BeanCaipu {
+	public static final String[] tableTitles={"²ËÆ×±àºÅ","²ËÆ×Ãû³Æ","²ËÆ×ÓÃÁÏ","²½Öè","Í¼Æ¬"};
+	public String getCell(int col){
+		if(col==0) return "" + this.getCaipubianhao();
+		else if(col==1) return "" + this.getCaipumingcheng();
+		else if(col==2) return "" + this.getCaipuyongliao();
+		else if(col==3) return "" + this.getBuzhou();
+		else if(col==4) return "" + this.getTupian();
+		else return "";
+	}
 	private int caipubianhao;
 	private String caipumingcheng;
 	private String caipuyongliao;

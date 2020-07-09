@@ -5,6 +5,10 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.JOptionPane;
 
 import itf.IYonghuManager;
 import model.BeanGuanliyuan;
@@ -26,9 +30,9 @@ public class YonghuManager implements IYonghuManager {
 		if("".equals(xingbie) || xingbie == null){
 			throw new BusinessException("性别不能为空");
 		}
-		if(!(xingbie.equals("男") || xingbie.equals("女")))
+		if(!(xingbie.equals("nan") || xingbie.equals("nv")))
 		{
-			throw new BusinessException("性别不能为除“男”、“女”外的其它字符");
+			throw new BusinessException("性别不能为除“nan”、“nv”外的其它字符");
 		}
 		if ("".equals(mima) || mima == null)
 		{
@@ -63,8 +67,10 @@ public class YonghuManager implements IYonghuManager {
 		{
 			throw new BusinessException("会员截止日期为空");
 		}
-		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Timestamp time;
+		if(!(huiyuanjiezhishijian == null || huiyuanjiezhishijian.equals("")))
+		{
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		try {
 			time = new Timestamp(format.parse(huiyuanjiezhishijian).getTime());
 		} catch (ParseException e1) {
@@ -72,9 +78,10 @@ public class YonghuManager implements IYonghuManager {
 			e1.printStackTrace();
 			throw new BusinessException("会员截止时间格式错误");
 		}
-		if (shifouhuiyuan1 == 1 && time.getTime() < System.currentTimeMillis())
+		}
+		else
 		{
-			throw new BusinessException("会员截止日期早于当前时间，会员信息无意义");
+			time = new Timestamp(System.currentTimeMillis());
 		}
 		Connection conn=null;
 		try {
@@ -110,6 +117,7 @@ public class YonghuManager implements IYonghuManager {
 			u.setZhuceshijian(new Timestamp(System.currentTimeMillis()));
 			u.setShifouhuiyuan(shifouhuiyuan1);
 			u.setHuiyuanjiezhiriqi(time);
+			JOptionPane.showMessageDialog(null,"注册成功", "注册结果",JOptionPane.PLAIN_MESSAGE);
 			return u;
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -159,6 +167,86 @@ public class YonghuManager implements IYonghuManager {
 			rs.close();
 			pst.close();
 			return u;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}
+		finally{
+			if(conn!=null)
+				try {
+					conn.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		}
+	}
+	
+	public List<BeanYonghu> loadAll() throws BaseException{
+		List<BeanYonghu> result=new ArrayList<BeanYonghu>();
+		Connection conn=null;
+		try {
+			conn=DBUtil.getConnection();
+			String sql="select yonghubianhao,xingming,xingbie,mima,shoujihaoma,youxiang,suozaichengshi,zhuceshijian,shifouhuiyuan,huiyuanjiezhishijian from yonghu";
+			java.sql.PreparedStatement pst=conn.prepareStatement(sql);
+			java.sql.ResultSet rs=pst.executeQuery();
+			while (rs.next()) {
+			BeanYonghu u = new BeanYonghu();
+			u.setYonghubianhao(rs.getInt(1));
+			u.setXingming(rs.getString(2));
+			u.setXingbie(rs.getString(3));
+			u.setMima(rs.getString(4));
+			u.setShoujihaoma(rs.getString(5));
+			u.setYouxiang(rs.getString(6));
+			u.setSuozaichengshi(rs.getString(7));
+			u.setZhuceshijian(rs.getTimestamp(8));
+			u.setShifouhuiyuan(rs.getInt(9));
+			u.setHuiyuanjiezhiriqi(rs.getTimestamp(10));
+			result.add(u);
+			}
+			pst.close();
+			rs.close();
+			return result;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}
+		finally{
+			if(conn!=null)
+				try {
+					conn.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		}
+	}
+	
+	public BeanYonghu changePwd(BeanYonghu user, String olddenglumima, String newdenglumima,
+			String newdenglumima2) throws BaseException
+	{
+		if("".equals(olddenglumima) || olddenglumima==null) throw new BusinessException("原始密码不能为空");
+		if("".equals(newdenglumima) || newdenglumima==null) throw new BusinessException("新密码不能为空");
+		if (!newdenglumima.equals(newdenglumima2)) throw new BusinessException("新密码两次输入不同");
+		Connection conn=null;
+		try {
+			conn=DBUtil.getConnection();
+			String sql="select xingming from yonghu where yonghubianhao = ?";
+			java.sql.PreparedStatement pst=conn.prepareStatement(sql);
+			pst.setInt(1,BeanYonghu.currentLoginYonghu.getYonghubianhao());
+			java.sql.ResultSet rs=pst.executeQuery();
+			if(!rs.next()) throw new BusinessException("登陆账号不存在");
+			if(!BeanYonghu.currentLoginYonghu.getMima().equals(olddenglumima)) throw new BusinessException("原始密码错误");
+			rs.close();
+			pst.close();
+			sql="update yonghu set mima = ? where yonghubianhao = ?";
+			pst=conn.prepareStatement(sql);
+			pst.setString(1, newdenglumima);
+			pst.setInt(2, BeanYonghu.currentLoginYonghu.getYonghubianhao());
+			pst.execute();
+			pst.close();
+			JOptionPane.showMessageDialog(null,"密码修改成功", "结果",JOptionPane.PLAIN_MESSAGE);
+			return BeanYonghu.currentLoginYonghu;
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new DbException(e);

@@ -3,6 +3,20 @@ package model;
 import java.sql.Timestamp;
 
 public class BeanYonghu {
+	public static final String[] tableTitles={"用户编号","姓名","性别","密码","手机号码","邮箱","所在城市","注册时间","是否会员","会员截止日期"};
+	public String getCell(int col){
+		if(col==0) return "" + this.getYonghubianhao();
+		else if(col==1) return "" + this.getXingming();
+		else if(col==2) return "" + this.getXingbie();
+		else if(col==3) return "" + this.getMima();
+		else if(col==4) return "" + this.getShoujihaoma();
+		else if(col==5) return "" + this.getYouxiang();
+		else if(col==6) return "" + this.getSuozaichengshi();
+		else if(col==7) return "" + this.getZhuceshijian();
+		else if(col==8) return "" + this.getShifouhuiyuan();
+		else if(col==9) return "" + this.getHuiyuanjiezhiriqi();
+		else return "";
+	}
 	public static BeanYonghu currentLoginYonghu = null;
 	private int yonghubianhao;
 	private String xingming;

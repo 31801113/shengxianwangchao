@@ -1,12 +1,18 @@
 package ui;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+
+import model.BeanCaipu;
+import model.BeanYonghu;
+import starter.Util;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.List;
 
 import util.BaseException;
 
@@ -56,8 +62,8 @@ public class FrmMain extends JFrame implements ActionListener{
     private JMenuItem  menuItem_ChaxunCaigou=new JMenuItem("查询采购");
     private JMenuItem  menuItem_Xiugaimima=new JMenuItem("修改密码");
     
-    private FrmLogin dlgLogin=null;
 	private JPanel statusBar = new JPanel();
+	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
@@ -166,6 +172,66 @@ public class FrmMain extends JFrame implements ActionListener{
 			FrmZengjiaXianshicuxiao dlg = new FrmZengjiaXianshicuxiao(this, "增加限时促销", true);
 			dlg.setVisible(true);
 		}
+		else if (e.getSource() == menuItem_ShanchuXianshicuxiao)
+		{
+			FrmShanchuXianshicuxiao dlg = new FrmShanchuXianshicuxiao(this, "删除限时促销", true);
+			dlg.setVisible(true);
+		}
+		else if (e.getSource() == menuItem_BianjiXianshicuxiao)
+		{
+			FrmBianjiXianshicuxiao dlg = new FrmBianjiXianshicuxiao(this, "编辑限时促销", true);
+			dlg.setVisible(true);
+		}
+		else if (e.getSource() == menuItem_ChaxunXianshicuxiao)
+		{
+			FrmChaxunXianshicuxiao dlg = new FrmChaxunXianshicuxiao(this, "查询限时促销", true);
+			dlg.setVisible(true);
+		}
+		else if (e.getSource() == menuItem_ZengjiaCaipu)
+		{
+			FrmZengjiaCaipu dlg = new FrmZengjiaCaipu(this, "增加菜谱", true);
+			dlg.setVisible(true);
+		}
+		else if (e.getSource() == menuItem_ShanchuCaipu)
+		{
+			FrmShanchuCaipu dlg = new FrmShanchuCaipu(this, "删除菜谱", true);
+			dlg.setVisible(true);
+		}
+		else if (e.getSource() == menuItem_BianjiCaipu)
+		{
+			FrmBianjiCaipu dlg = new FrmBianjiCaipu(this, "编辑菜谱", true);
+			dlg.setVisible(true);
+		}
+		else if (e.getSource() == menuItem_ChaxunCaipu)
+		{
+			FrmChaxunCaipu dlg = new FrmChaxunCaipu(this, "查询菜谱", true);
+			dlg.setVisible(true);
+		}
+		else if (e.getSource() == menuItem_Xiugaimima)
+		{
+			FrmChangePwd dlg = new FrmChangePwd(this, "修改密码", true);
+			dlg.setVisible(true);
+		}
+		else if (e.getSource() == menuItem_ZengjiaCaigou)
+		{
+			FrmZengjiaCaigou dlg = new FrmZengjiaCaigou(this, "增加采购", true);
+			dlg.setVisible(true);
+		}
+		else if (e.getSource() == menuItem_ShanchuCaigou)
+		{
+			FrmShanchuCaigou dlg = new FrmShanchuCaigou(this, "删除采购", true);
+			dlg.setVisible(true);
+		}
+		else if (e.getSource() == menuItem_BianjiCaigou)
+		{
+			FrmBianjiCaigou dlg = new FrmBianjiCaigou(this, "编辑采购", true);
+			dlg.setVisible(true);
+		}
+		else if (e.getSource() == menuItem_ChaxunCaigou)
+		{
+			FrmChaxunCaigou dlg = new FrmChaxunCaigou(this, "编辑采购", true);
+			dlg.setVisible(true);
+		}
 	}
 	
 	public FrmMain()
@@ -217,6 +283,7 @@ public class FrmMain extends JFrame implements ActionListener{
 		menubar.add(menu_manzhe);
 		menubar.add(menu_xianshicuxiao);
 		menubar.add(menu_caipu);
+		menubar.add(menu_caigou);
 		menubar.add(menu_gengduo);
 		
 		this.setJMenuBar(menubar);
@@ -230,6 +297,9 @@ public class FrmMain extends JFrame implements ActionListener{
 	    		System.exit(0);
              }
         });
+	    if (dlgLogin.getflag() == 1)
+	    {
 	    this.setVisible(true);
+	    }
 	}
 }
