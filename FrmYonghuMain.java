@@ -19,6 +19,7 @@ public class FrmYonghuMain extends JFrame implements ActionListener{
 	private JMenuBar menubar=new JMenuBar();
     private JMenu menu_gerenxinxiguanli=new JMenu("个人信息管理");
     private JMenu menu_goumairukou=new JMenu("购买入口");
+    private JMenu menu_pingjiaguanli=new JMenu("评价管理");
     private JMenu menu_gengduo=new JMenu("更多");
     
     private JMenuItem  menuItem_Xiugaimima=new JMenuItem("修改密码");
@@ -29,6 +30,9 @@ public class FrmYonghuMain extends JFrame implements ActionListener{
     private JMenuItem  menuItem_Chaxunyouhuiquan=new JMenuItem("查询优惠券");
     private JMenuItem  menuItem_Chaxunmanzhexinxi=new JMenuItem("查询满折信息");
     private JMenuItem  menuItem_Chaxunxianshicuxiao=new JMenuItem("查询限时促销");
+    private JMenuItem  menuItem_Zengjiapingjia=new JMenuItem("增加评价");
+    private JMenuItem  menuItem_Bianjipingjia=new JMenuItem("编辑评价");
+    private JMenuItem  menuItem_Shanchupingjia=new JMenuItem("删除评价");
     private JMenuItem  menuItem_Chengweihuiyuan=new JMenuItem("成为会员");
     
 	private JPanel statusBar = new JPanel();
@@ -39,6 +43,26 @@ public class FrmYonghuMain extends JFrame implements ActionListener{
 		if (e.getSource() == menuItem_Xiugaimima)
 		{
 			FrmXiugaimima dlg=new FrmXiugaimima(this,"修改密码",true);
+			dlg.setVisible(true);
+		}
+		else if (e.getSource() == menuItem_Bianjigerenxinxi)
+		{
+			FrmBianjigerenxinxi dlg = new FrmBianjigerenxinxi(this, "编辑个人信息", true);
+			dlg.setVisible(true);
+		}
+		else if (e.getSource() == menuItem_Bianjipeisongdizhi)
+		{
+			FrmBianjipeisongdizhi dlg = new FrmBianjipeisongdizhi(this, "编辑配送地址", true);
+			dlg.setVisible(true);
+		}
+		else if (e.getSource() == menuItem_Chaxunshangpindingdan)
+		{
+			FrmChaxunshangpindingdan dlg= new FrmChaxunshangpindingdan();
+			dlg.setVisible(true);
+		}
+		else if (e.getSource() == menuItem_Goumaishangpin)
+		{
+			FrmGoumaishangpin dlg= new FrmGoumaishangpin();
 			dlg.setVisible(true);
 		}
 	}
@@ -56,10 +80,14 @@ public class FrmYonghuMain extends JFrame implements ActionListener{
 		this.menu_goumairukou.add(this.menuItem_Chaxunyouhuiquan);this.menuItem_Chaxunyouhuiquan.addActionListener(this);
 		this.menu_goumairukou.add(this.menuItem_Chaxunmanzhexinxi);this.menuItem_Chaxunmanzhexinxi.addActionListener(this);
 		this.menu_goumairukou.add(this.menuItem_Chaxunxianshicuxiao);this.menuItem_Chaxunxianshicuxiao.addActionListener(this);
+		this.menu_pingjiaguanli.add(this.menuItem_Zengjiapingjia);this.menuItem_Zengjiapingjia.addActionListener(this);
+		this.menu_pingjiaguanli.add(this.menuItem_Bianjipingjia);this.menuItem_Bianjipingjia.addActionListener(this);
+		this.menu_pingjiaguanli.add(this.menuItem_Shanchupingjia);this.menuItem_Shanchupingjia.addActionListener(this);
 		this.menu_gengduo.add(this.menuItem_Chengweihuiyuan);this.menuItem_Chengweihuiyuan.addActionListener(this);
 		
 		menubar.add(menu_gerenxinxiguanli);
 		menubar.add(menu_goumairukou);
+		menubar.add(menu_pingjiaguanli);
 		menubar.add(menu_gengduo);
 		
 		this.setJMenuBar(menubar);

@@ -1,6 +1,13 @@
 package model;
 
 public class BeanShengxianleibie {
+	public static final String[] tableTitles={"类别编号","类别名称","类别描述"};
+	public String getCell(int col){
+		if(col==0) return "" + this.getLeibiebianhao();
+		else if(col==1) return "" + this.getLeibiemingcheng();
+		else if(col==2) return "" + this.getLeibiemiaoshu();
+		else return "";
+	}
 	private int leibiebianhao;
 	private String leibiemingcheng;
 	private String leibiemiaoshu;

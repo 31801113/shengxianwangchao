@@ -1,12 +1,12 @@
 CREATE TABLE shengxianleibie (
-  leibiebianhao int(11) NOT NULL AUTO_INCREMENT,
+  leibiebianhao int(11) NOT NULL,
   leibiemingcheng varchar(50) NOT NULL,
   leibiemiaoshu varchar(255) NOT NULL,
   PRIMARY KEY (leibiebianhao)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE shangpin (
-  shangpinbianhao int(11) NOT NULL AUTO_INCREMENT,
+  shangpinbianhao int(11) NOT NULL,
   shangpinmingcheng varchar(50) NOT NULL,
   jiage double NOT NULL,
   huiyuanjia double NOT NULL,
@@ -19,7 +19,7 @@ CREATE TABLE shangpin (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE caipu (
-  caipubianhao int(11) NOT NULL AUTO_INCREMENT,
+  caipubianhao int(11) NOT NULL,
   caipumingcheng varchar(50) NOT NULL,
   caipuyongliao varchar(255) NOT NULL,
   buzhou varchar(255) NOT NULL,
@@ -45,7 +45,7 @@ CREATE TABLE shangpinpingjia (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE youhuiquan (
-  youhuiquanbianhao int(11) NOT NULL AUTO_INCREMENT,
+  youhuiquanbianhao int(11) NOT NULL,
   neirong varchar(255) NOT NULL,
   shiyongjine double NOT NULL,
   jianmianjine double NOT NULL,
@@ -55,7 +55,7 @@ CREATE TABLE youhuiquan (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE manzhe (
-  manzhebianhao int(11) NOT NULL AUTO_INCREMENT,
+  manzhebianhao int(11) NOT NULL,
   neirong varchar(255) NOT NULL,
   shiyongshangpinshuliang double NOT NULL,
   zhekou double NOT NULL,
@@ -73,7 +73,7 @@ CREATE TABLE manzheshangpinguanlian (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE xianshicuxiao (
-  cuxiaobianhao int(11) NOT NULL AUTO_INCREMENT,
+  cuxiaobianhao int(11) NOT NULL,
   shangpinbianhao int(11) NOT NULL,
   cuxiaojiage double NOT NULL,
   cuxiaoshuliang double NOT NULL,
@@ -97,7 +97,7 @@ CREATE TABLE yonghu (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE peisongdizhi (
-  dizhibianhao int(11) NOT NULL AUTO_INCREMENT,
+  dizhibianhao int(11) NOT NULL,
   yonghubianhao int(11) NOT NULL,
   sheng varchar(50) NOT NULL,
   shi varchar(50) NOT NULL,
@@ -110,7 +110,7 @@ CREATE TABLE peisongdizhi (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE shangpindingdan (
-  dingdanbianhao int(11) NOT NULL AUTO_INCREMENT,
+  dingdanbianhao int(11) NOT NULL,
   yonghubianhao int(11) NOT NULL,
   yuanshijine double NOT NULL,
   jiesuanjine double NOT NULL,
@@ -137,7 +137,7 @@ CREATE TABLE dingdanxiangqing (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE shangpincaigou (
-  caigoudanbianhao int(11) NOT NULL AUTO_INCREMENT,
+  caigoudanbianhao int(11) NOT NULL,
   shicaibianhao int(11) NOT NULL,
   shuliang double NOT NULL,
   zhuangtai varchar(50) NOT NULL check (zhuangtai in ('下单','在途','入库')),
@@ -149,4 +149,15 @@ CREATE TABLE guanliyuan (
   yuangongxingming varchar(50) NOT NULL,
   denglumima varchar(50) NOT NULL,
   PRIMARY KEY (yuangongbianhao)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE gouwuche (
+  gouwuchebianhao int(11) NOT NULL,
+  yonghubianhao int(11) NOT NULL,
+  shangpinbianhao int(11) NOT NULL,
+  yonghuorder int(11) NOT NULL,
+  shuliang double NOT NULL,
+  PRIMARY KEY (gouwuchebianhao),
+  FOREIGN KEY (shangpinbianhao) REFERENCES shangpin(shangpinbianhao),
+  FOREIGN KEY (yonghubianhao) REFERENCES yonghu(yonghubianhao)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
