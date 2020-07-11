@@ -65,6 +65,21 @@ public class FrmYonghuMain extends JFrame implements ActionListener{
 			FrmGoumaishangpin dlg= new FrmGoumaishangpin();
 			dlg.setVisible(true);
 		}
+		else if (e.getSource() == menuItem_Chaxunyouhuiquan)
+		{
+			FrmYonghuChaxunyouhuiquan dlg = new FrmYonghuChaxunyouhuiquan();
+			dlg.setVisible(true);
+		}
+		else if (e.getSource() == menuItem_Chaxunmanzhexinxi)
+		{
+			FrmYonghuChaxunmanzhe dlg = new FrmYonghuChaxunmanzhe();
+			dlg.setVisible(true);
+		}
+		else if (e.getSource() == menuItem_Chaxunxianshicuxiao)
+		{
+			FrmYonghuChaxunxianshicuxiao dlg = new FrmYonghuChaxunxianshicuxiao();
+			dlg.setVisible(true);
+		}
 	}
 	
 	public FrmYonghuMain()

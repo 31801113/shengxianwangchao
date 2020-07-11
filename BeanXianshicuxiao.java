@@ -3,6 +3,16 @@ package model;
 import java.sql.Timestamp;
 
 public class BeanXianshicuxiao {
+	public static final String[] tableTitles={"促销编号","商品编号","促销价格","促销数量","起始日期","结束日期"};
+	public String getCell(int col){
+		if(col==0) return "" + this.getCuxiaobianhao();
+		else if(col==1) return "" + this.getShangpinbianhao();
+		else if(col==2) return "" + this.getCuxiaojiage();
+		else if(col==3) return "" + this.getCuxiaoshuliang();
+		else if(col==4) return "" + this.getQishiriqi();
+		else if(col==5) return "" + this.getJieshuriqi();
+		else return "";
+	}
 	private int cuxiaobianhao;
 	private int shangpinbianhao;
 	private double cuxiaojiage;

@@ -22,6 +22,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
+import org.jboss.logging.DelegatingBasicLogger;
+
 import model.BeanShangpin;
 import model.BeanShengxianleibie;
 import starter.Util;
@@ -141,7 +143,8 @@ public class FrmGoumaishangpin extends JFrame implements ActionListener {
 		}
 		else if (e.getSource()==this.menuItem_Chakangouwuche)
 		{
-			
+			FrmChaxungouwuche dlg = new FrmChaxungouwuche();
+			dlg.setVisible(true);
 		}
 	}
 }

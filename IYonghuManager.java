@@ -2,6 +2,7 @@ package itf;
 
 import java.util.List;
 
+import model.BeanGouwuche;
 import model.BeanShangpin;
 import model.BeanYonghu;
 import util.BaseException;
@@ -22,4 +23,9 @@ public interface IYonghuManager {
 	
 	public BeanYonghu Jiarugouwuche(BeanShangpin shangpin, String shuliang) throws BaseException;
 	
+	public BeanYonghu Quxiaogoumai(BeanGouwuche Gouwuche) throws BaseException;
+	
+	public BeanYonghu Fukuangoumai(List<BeanGouwuche> allGouwuche,String songdashijian) throws BaseException;
+	
+	public BeanYonghu Zengjiapingjia(String shangpinbianhao,String pingjianeirong,String xingji,String zhaopian) throws BaseException;
 }
