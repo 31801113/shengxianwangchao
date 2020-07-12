@@ -9,6 +9,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import javax.swing.JFrame;
@@ -23,11 +26,10 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
 import model.BeanGouwuche;
-import model.BeanShangpin;
-import model.BeanShengxianleibie;
 import model.BeanYonghu;
 import starter.Util;
 import util.BaseException;
+import util.BusinessException;
 
 public class FrmChaxungouwuche extends JFrame implements ActionListener{
 	private JMenuBar menubar=new JMenuBar();
@@ -35,6 +37,9 @@ public class FrmChaxungouwuche extends JFrame implements ActionListener{
     
     private JMenuItem  menuItem_Quxiaogoumai=new JMenuItem("取消购买");
     private JMenuItem  menuItem_Fukuangoumai=new JMenuItem("付款购买");
+    private JMenuItem  menuItem_Xiugaishuliang=new JMenuItem("修改数量");
+    private JMenuItem  menuItem_Shuaxin=new JMenuItem("刷新");
+    private JMenuItem  menuItem_Fanhui=new JMenuItem("返回");
 	private JPanel statusBar = new JPanel();
 	
 	private Object tblGouwucheTitle[]=BeanGouwuche.tableTitles;
@@ -42,8 +47,6 @@ public class FrmChaxungouwuche extends JFrame implements ActionListener{
 	DefaultTableModel tabGouwucheModel=new DefaultTableModel();
 	private JTable dataTableGouwuche=new JTable(tabGouwucheModel);
 
-	
-	private BeanGouwuche curGouwuche=null;
 	List<BeanGouwuche> allGouwuche=null;
 	private void reloadGouwucheTable(){//这是测试数据，需要用实际数替换
 		try {
@@ -68,6 +71,9 @@ public class FrmChaxungouwuche extends JFrame implements ActionListener{
 	    //菜单
 	    this.menu_Ganligouwuche.add(this.menuItem_Quxiaogoumai); this.menuItem_Quxiaogoumai.addActionListener(this);
 	    this.menu_Ganligouwuche.add(this.menuItem_Fukuangoumai); this.menuItem_Fukuangoumai.addActionListener(this);
+	    this.menu_Ganligouwuche.add(this.menuItem_Xiugaishuliang); this.menuItem_Xiugaishuliang.addActionListener(this);
+	    this.menu_Ganligouwuche.add(this.menuItem_Shuaxin); this.menuItem_Shuaxin.addActionListener(this);
+	    this.menu_Ganligouwuche.add(this.menuItem_Fanhui); this.menuItem_Fanhui.addActionListener(this);
 	    
 	    menubar.add(menu_Ganligouwuche);
 	    this.setJMenuBar(menubar);
@@ -107,6 +113,9 @@ public class FrmChaxungouwuche extends JFrame implements ActionListener{
 			}
 			try {
 				Util.yonghuManager.Quxiaogoumai(allGouwuche.get(i));
+				this.setVisible(false);
+				FrmChaxungouwuche dlg = new FrmChaxungouwuche();
+				dlg.setVisible(true);
 			} catch (BaseException e1) {
 				JOptionPane.showMessageDialog(null, e1.getMessage(), "错误",JOptionPane.ERROR_MESSAGE);
 				return;
@@ -114,13 +123,61 @@ public class FrmChaxungouwuche extends JFrame implements ActionListener{
 		}
 		else if (e.getSource()==this.menuItem_Fukuangoumai)
 		{
+			if (allGouwuche.size() == 0)
+			{
+				JOptionPane.showMessageDialog(null,"购物车商品数不能为0", "错误",JOptionPane.ERROR_MESSAGE);
+			}
+			else
+			{
 			String songdashijian = JOptionPane.showInputDialog("请输入送达时间");
+			if (songdashijian == null || songdashijian.equals(""))
+			{
+				JOptionPane.showMessageDialog(null,"送达时间不能为空", "错误",JOptionPane.ERROR_MESSAGE);
+			}
+			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			try {
+				Timestamp time = new Timestamp(format.parse(songdashijian).getTime());
+			} catch (ParseException e1) {
+				// TODO Auto-generated catch block
+				    e1.printStackTrace();
+				    JOptionPane.showMessageDialog(null,"送达时间格式错误", "错误",JOptionPane.ERROR_MESSAGE);
+				}
 			try {
 				BeanYonghu.currentLoginYonghu = Util.yonghuManager.Fukuangoumai(allGouwuche, songdashijian);
+				this.setVisible(false);
 			} catch (BaseException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
+			}
+		}
+		else if (e.getSource() == this.menuItem_Xiugaishuliang)
+		{
+			int i=FrmChaxungouwuche.this.dataTableGouwuche.getSelectedRow();
+			if(i<0) {
+				JOptionPane.showMessageDialog(null, "请选择商品", "错误",JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			try {
+				String shuliang = JOptionPane.showInputDialog("请输入修改数量");
+				Util.yonghuManager.Xiugaishuliang(allGouwuche.get(i), shuliang);
+				this.setVisible(false);
+				FrmChaxungouwuche dlg = new FrmChaxungouwuche();
+				dlg.setVisible(true);
+			} catch (BaseException e1) {
+				JOptionPane.showMessageDialog(null, e1.getMessage(), "错误",JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+		}
+		else if (e.getSource()==this.menuItem_Shuaxin)
+		{
+			this.setVisible(false);
+			FrmChaxungouwuche dlg = new FrmChaxungouwuche();
+			dlg.setVisible(true);
+		}
+		else if (e.getSource()==this.menuItem_Fanhui)
+		{
+			this.setVisible(false);
 		}
 	}
 }

@@ -61,6 +61,7 @@ public class FrmMain extends JFrame implements ActionListener{
     private JMenuItem  menuItem_BianjiCaigou=new JMenuItem("±à¼­²É¹º");
     private JMenuItem  menuItem_ChaxunCaigou=new JMenuItem("²éÑ¯²É¹º");
     private JMenuItem  menuItem_Xiugaimima=new JMenuItem("ÐÞ¸ÄÃÜÂë");
+    private JMenuItem  menuItem_Tuichudenglu=new JMenuItem("ÍË³öµÇÂ¼");
     
 	private JPanel statusBar = new JPanel();
 	
@@ -232,6 +233,12 @@ public class FrmMain extends JFrame implements ActionListener{
 			FrmChaxunCaigou dlg = new FrmChaxunCaigou(this, "±à¼­²É¹º", true);
 			dlg.setVisible(true);
 		}
+		else if (e.getSource() == menuItem_Tuichudenglu)
+		{
+			this.setVisible(false);
+			FrmMain dlg = new FrmMain();
+			dlg.setVisible(true);
+		}
 	}
 	
 	public FrmMain()
@@ -275,6 +282,7 @@ public class FrmMain extends JFrame implements ActionListener{
 		this.menu_caigou.add(this.menuItem_BianjiCaigou);this.menuItem_BianjiCaigou.addActionListener(this);
 		this.menu_caigou.add(this.menuItem_ChaxunCaigou);this.menuItem_ChaxunCaigou.addActionListener(this);
 		this.menu_gengduo.add(this.menuItem_Xiugaimima);this.menuItem_Xiugaimima.addActionListener(this);
+		this.menu_gengduo.add(this.menuItem_Tuichudenglu);this.menuItem_Tuichudenglu.addActionListener(this);
 		
 		menubar.add(menu_yonghu);
 		menubar.add(menu_shengxianleibie);
@@ -300,6 +308,10 @@ public class FrmMain extends JFrame implements ActionListener{
 	    if (dlgLogin.getflag() == 1)
 	    {
 	    this.setVisible(true);
+	    }
+	    else
+	    {
+	    	this.setVisible(false);
 	    }
 	}
 }

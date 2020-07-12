@@ -28,4 +28,12 @@ public interface IYonghuManager {
 	public BeanYonghu Fukuangoumai(List<BeanGouwuche> allGouwuche,String songdashijian) throws BaseException;
 	
 	public BeanYonghu Zengjiapingjia(String shangpinbianhao,String pingjianeirong,String xingji,String zhaopian) throws BaseException;
+	
+	public BeanYonghu Bianjipingjia(String shangpinbianhao,String pingjianeirong,String xingji,String zhaopian) throws BaseException;
+	
+	public BeanYonghu Shanchupingjia(String shangpinbianhao) throws BaseException;
+	
+	public BeanYonghu Xiugaishuliang(BeanGouwuche Gouwuche,String shuliang) throws BaseException;
+	
+	public BeanYonghu Chengweihuiyuan(BeanYonghu user) throws BaseException;
 }

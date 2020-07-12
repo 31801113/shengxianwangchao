@@ -22,7 +22,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
+import model.BeanDingdanxiangqing;
+import model.BeanShangpin;
 import model.BeanShangpindingdan;
+import model.BeanShengxianleibie;
 import starter.Util;
 import util.BaseException;
 
@@ -36,7 +39,14 @@ public class FrmChaxunshangpindingdan extends JFrame implements ActionListener{
 	DefaultTableModel tabShangpindingdanModel=new DefaultTableModel();
 	private JTable dataTableShangpindingdan=new JTable(tabShangpindingdanModel);
 	
+	private Object tblDingdanxiangqingTitle[]=BeanDingdanxiangqing.tableTitles;
+	private Object tblDingdanxiangqingData[][];
+	DefaultTableModel tabDingdanxiangqingModel=new DefaultTableModel();
+	private JTable dataTableDingdanxiangqing=new JTable(tabDingdanxiangqingModel);
+	
+	private BeanShangpindingdan curShangpindingdan=null;
 	List<BeanShangpindingdan> allShangpindingdan=null;
+	List<BeanDingdanxiangqing> planDingdanxiangqing=null;
 	private void reloadShangpindingdanTable(){//这是测试数据，需要用实际数替换
 		try {
 			allShangpindingdan=Util.ShangpindingdanManager.loadAll();
@@ -53,6 +63,25 @@ public class FrmChaxunshangpindingdan extends JFrame implements ActionListener{
 		this.dataTableShangpindingdan.validate();
 		this.dataTableShangpindingdan.repaint();
 	}
+	private void reloadPlanDingdanxiangqingTabel(int planIdx){
+		if(planIdx<0) return;
+		curShangpindingdan=allShangpindingdan.get(planIdx);
+		try {
+			planDingdanxiangqing=Util.dingdanxiangqingManager.loadDingdanxiangqing(curShangpindingdan);
+		} catch (BaseException e) {
+			JOptionPane.showMessageDialog(null, e.getMessage(), "错误",JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		tblDingdanxiangqingData =new Object[planDingdanxiangqing.size()][BeanDingdanxiangqing.tableTitles.length];
+		for(int i=0;i<planDingdanxiangqing.size();i++){
+			for(int j=0;j<BeanDingdanxiangqing.tableTitles.length;j++)
+				tblDingdanxiangqingData[i][j]=planDingdanxiangqing.get(i).getCell(j);
+		}
+		
+		tabDingdanxiangqingModel.setDataVector(tblDingdanxiangqingData,tblDingdanxiangqingTitle);
+		this.dataTableDingdanxiangqing.validate();
+		this.dataTableDingdanxiangqing.repaint();
+	}
 	public FrmChaxunshangpindingdan(){
 		
 		this.setExtendedState(Frame.MAXIMIZED_BOTH);
@@ -60,8 +89,20 @@ public class FrmChaxunshangpindingdan extends JFrame implements ActionListener{
 	    //菜单
 	    this.setJMenuBar(menubar);
 	    
-	    this.getContentPane().add(new JScrollPane(this.dataTableShangpindingdan), BorderLayout.CENTER);
-	  
+	    this.getContentPane().add(new JScrollPane(this.dataTableShangpindingdan), BorderLayout.WEST);
+	    this.dataTableShangpindingdan.addMouseListener(new MouseAdapter (){
+
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				int i=FrmChaxunshangpindingdan.this.dataTableShangpindingdan.getSelectedRow();
+				if(i<0) {
+					return;
+				}
+				FrmChaxunshangpindingdan.this.reloadPlanDingdanxiangqingTabel(i);
+			}
+	    	
+	    });
+	    this.getContentPane().add(new JScrollPane(this.dataTableDingdanxiangqing), BorderLayout.CENTER);
 	    
 	    this.reloadShangpindingdanTable();
 	    //状态栏

@@ -13,24 +13,24 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import model.BeanGuanliyuan;
+import model.BeanYonghu;
 import starter.Util;
 import util.BaseException;
 
-public class FrmZengjiaCaigou extends JDialog implements ActionListener{
+public class FrmBianjipingjia extends JDialog implements ActionListener{
 	private JPanel toolBar = new JPanel();
 	private JPanel workPane = new JPanel();
-	private JButton btn = new JButton("增加");
-	private JLabel label1 = new JLabel("采购编号：");
-	private JLabel label2 = new JLabel("食材编号：");
-	private JLabel label3 = new JLabel("数量：");
-	private JLabel label4 = new JLabel("状态：");
+	private JButton btn = new JButton("更新");
+	private JLabel label1 = new JLabel("商品编号：");
+	private JLabel label3 = new JLabel("评价内容：");
+	private JLabel label5 = new JLabel("星级：");
+	private JLabel label6 = new JLabel("照片：");
 	private JTextField edt1 = new JTextField(20);
-	private JTextField edt2 = new JTextField(20);
 	private JTextField edt3 = new JTextField(20);
-	private JTextField edt4 = new JTextField(20);
+	private JTextField edt5 = new JTextField(20);
+	private JTextField edt6 = new JTextField(20);
 	
-	public FrmZengjiaCaigou(FrmMain f, String s, boolean b) {
+	public FrmBianjipingjia(FrmYonghuMain f, String s, boolean b) {
 		// TODO Auto-generated constructor stub
 		super(f,s,b);
 		toolBar.setLayout(new FlowLayout(FlowLayout.RIGHT));
@@ -38,12 +38,12 @@ public class FrmZengjiaCaigou extends JDialog implements ActionListener{
 		this.getContentPane().add(toolBar, BorderLayout.SOUTH);
 		workPane.add(label1);
 		workPane.add(edt1);
-		workPane.add(label2);
-		workPane.add(edt2);
 		workPane.add(label3);
 		workPane.add(edt3);
-		workPane.add(label4);
-		workPane.add(edt4);
+		workPane.add(label5);
+		workPane.add(edt5);
+		workPane.add(label6);
+		workPane.add(edt6);
 		this.getContentPane().add(workPane, BorderLayout.CENTER);
 		this.setSize(330, 400);
 		// 屏幕居中显示
@@ -63,12 +63,12 @@ public class FrmZengjiaCaigou extends JDialog implements ActionListener{
 		// TODO Auto-generated method stub
 		if (e.getSource() == this.btn)
 		{
-			String caigoudanbianhao = new String(this.edt1.getText());
-			String shicaibianhao = new String(this.edt2.getText());
-			String shuliang = new String(this.edt3.getText());
-			String zhuangtai = new String(this.edt4.getText());
+			String shangpinbianhao = new String(this.edt1.getText());
+			String pingjianeirong = new String(this.edt3.getText());
+			String xingji = new String(this.edt5.getText());
+			String zhaopian = new String(this.edt6.getText());
 			try {
-				BeanGuanliyuan.currentLoginGuanliyuan = Util.guanliyuanManager.ZengjiaCaigou(caigoudanbianhao, shicaibianhao, shuliang, zhuangtai);
+				BeanYonghu.currentLoginYonghu = Util.yonghuManager.Bianjipingjia(shangpinbianhao, pingjianeirong, xingji, zhaopian);
 			}catch (BaseException e1) {
 				JOptionPane.showMessageDialog(null, e1.getMessage(), "错误",JOptionPane.ERROR_MESSAGE);
 				return;

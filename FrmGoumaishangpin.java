@@ -35,6 +35,7 @@ public class FrmGoumaishangpin extends JFrame implements ActionListener {
     
     private JMenuItem  menuItem_Jiarugouwuche=new JMenuItem("加入购物车");
     private JMenuItem  menuItem_Chakangouwuche=new JMenuItem("查看购物车");
+    private JMenuItem  menuItem_Fanhui=new JMenuItem("返回");
 	private JPanel statusBar = new JPanel();
 	
 	private Object tblShengxianleibieTitle[]=BeanShengxianleibie.tableTitles;
@@ -93,6 +94,7 @@ public class FrmGoumaishangpin extends JFrame implements ActionListener {
 	    //菜单
 	    this.menu_Goumaishangpin.add(this.menuItem_Jiarugouwuche); this.menuItem_Jiarugouwuche.addActionListener(this);
 	    this.menu_Goumaishangpin.add(this.menuItem_Chakangouwuche); this.menuItem_Chakangouwuche.addActionListener(this);
+	    this.menu_Goumaishangpin.add(this.menuItem_Fanhui); this.menuItem_Fanhui.addActionListener(this);
 	    
 	    menubar.add(menu_Goumaishangpin);
 	    this.setJMenuBar(menubar);
@@ -145,6 +147,10 @@ public class FrmGoumaishangpin extends JFrame implements ActionListener {
 		{
 			FrmChaxungouwuche dlg = new FrmChaxungouwuche();
 			dlg.setVisible(true);
+		}
+		else if (e.getSource()==this.menuItem_Fanhui)
+		{
+			this.setVisible(false);
 		}
 	}
 }

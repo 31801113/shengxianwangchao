@@ -5,15 +5,17 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import itf.ICaipuManager;
 import model.BeanCaipu;
-
+import model.BeanYouhuiquan;
 import util.BaseException;
 import util.DBUtil;
 import util.DbException;
 
-public class CaipuManager {
-	public List<BeanCaipu> loadAll() throws BaseException
+public class CaipuManager implements ICaipuManager{
+	public List<BeanCaipu> loadAll() throws BaseException 
 	{
+		// TODO Auto-generated method stub
 		List<BeanCaipu> result=new ArrayList<BeanCaipu>();
 		Connection conn=null;
 		try {
@@ -25,8 +27,9 @@ public class CaipuManager {
 			BeanCaipu u = new BeanCaipu();
 			u.setCaipubianhao(rs.getInt(1));
 			u.setCaipumingcheng(rs.getString(2));
-			u.setBuzhou(rs.getString(3));
-			u.setTupian(rs.getString(4));
+			u.setCaipuyongliao(rs.getString(3));
+			u.setBuzhou(rs.getString(4));
+			u.setTupian(rs.getString(5));
 			result.add(u);
 			}
 			pst.close();

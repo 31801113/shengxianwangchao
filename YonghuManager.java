@@ -1,5 +1,6 @@
 package control;
 
+import java.math.BigDecimal;
 import java.security.interfaces.RSAKey;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -13,6 +14,7 @@ import javax.crypto.spec.PSource;
 import javax.swing.JOptionPane;
 
 import org.hibernate.sql.Insert;
+import org.hibernate.sql.Select;
 
 import itf.IYonghuManager;
 import model.BeanGouwuche;
@@ -415,9 +417,9 @@ public class YonghuManager implements IYonghuManager {
 	public BeanYonghu Jiarugouwuche(BeanShangpin shangpin, String shuliang) throws BaseException 
 	{
 		if("".equals(shuliang) || shuliang==null) throw new BusinessException("数量不能为空");
-		if (Double.valueOf(shuliang) > shangpin.getShuliang())
+		if (Double.valueOf(shuliang) > shangpin.getShuliang() || Double.valueOf(shuliang) == 0)
 		{
-			throw new BusinessException("输入数量不能大于现在数量");
+			throw new BusinessException("输入数量不能大于现在数量且不能为0");
 		}
 		Connection conn=null;
 		try {
@@ -555,96 +557,69 @@ public class YonghuManager implements IYonghuManager {
 		{
 			throw new BusinessException("送达时间不能为空");
 		}
+		int xianshicuxiaoflag = 0;
+		int youhuiquanflag = 0;
+		int manzheflag = 0;
+		double yuanjine = 0;
 		double jine = 0;
+		int youhuiquanbianhao;
+		double youhuijine;
+		Connection conn=null;
+		try {
+			conn=DBUtil.getConnection();
+			int peisongdizhibianhao;
+			String sql = "select dizhibianhao from peisongdizhi where yonghubianhao = ?";
+			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+			pst.setInt(1, BeanYonghu.currentLoginYonghu.getYonghubianhao());
+			java.sql.ResultSet rs = pst.executeQuery();
+			if (!rs.next())
+			{
+				JOptionPane.showMessageDialog(null, "地址不存在，请先编辑地址", "错误",JOptionPane.ERROR_MESSAGE);
+				throw new BusinessException("地址不存在，请先编辑地址");
+			}
+			else
+			{
+				peisongdizhibianhao = rs.getInt(1);
+			}} catch (SQLException e) {
+				e.printStackTrace();
+				throw new DbException(e);
+			}
+			finally{
+				if(conn!=null)
+					try {
+						conn.close();
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+			}
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		try {
+			Timestamp time = new Timestamp(format.parse(songdashijian).getTime());
+		} catch (ParseException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			throw new BusinessException("送达时间格式错误");
+		}
 		for (int i = 0;i < allGouwuche.size();i++)
 		{
-			double meixiangjine = 0;
-			Connection conn=null;
 			try {
 				conn=DBUtil.getConnection();
-				String sql="select a.manzhebianhao,zhekou,shiyongshangpinshuliang from manzheshangpinguanlian a,manzhe b where a.manzhebianhao = b.manzhebianhao and a.shangpinbianhao = ?";
+				String sql="select shuliang from shangpin where shangpinbianhao = ?";
 				java.sql.PreparedStatement pst=conn.prepareStatement(sql);
 				pst.setInt(1,allGouwuche.get(i).getShangpinbianhao());
-				java.sql.ResultSet rs = pst.executeQuery();
-				if (rs.next())
-				{
-				int manzhebianhao = rs.getInt(1);
-				double zhekou = rs.getDouble(2);
-				double shiyongshangpinshuliang = rs.getDouble(3);
-				if (shiyongshangpinshuliang >= allGouwuche.get(i).getShuliang())
-				{
-					meixiangjine = allGouwuche.get(i).getJiage() * allGouwuche.get(i).getShuliang()*zhekou;
-					int dingdanbianhao = 1;
-					sql = "select yonghubianhao from shangpindingdan";
-					pst = conn.prepareStatement(sql);
-					rs = pst.executeQuery();
-					if (rs.next())
-					{
-						sql = "select max(dingdanbianhao) from shangpindingdan";
-						pst = conn.prepareStatement(sql);
-						rs = pst.executeQuery();
-						rs.next();
-						dingdanbianhao = rs.getInt(1) + 1;
-					}
-					sql = "insert into dingdanxiangqing(dingdanbianhao,shangpinbianhao,shuliang,jiage,zhekou,manzhebianhao) values(?,?,?,?,?,?)";
-					pst = conn.prepareStatement(sql);
-					pst.setInt(1, dingdanbianhao);
-					pst.setInt(2, allGouwuche.get(i).getShangpinbianhao());
-					pst.setDouble(3, allGouwuche.get(i).getShuliang());
-					pst.setDouble(4, allGouwuche.get(i).getJiage());
-					pst.setDouble(5, zhekou);
-					pst.setInt(6, manzhebianhao);
-					pst.execute();
-				}
-				else {
-					meixiangjine = (allGouwuche.get(i).getShuliang() - shiyongshangpinshuliang) * allGouwuche.get(i).getJiage() + shiyongshangpinshuliang * allGouwuche.get(i).getJiage() * zhekou;
-				int dingdanbianhao = 1;
-				sql = "select yonghubianhao from shangpindingdan";
-				pst = conn.prepareStatement(sql);
-				rs = pst.executeQuery();
-				if (rs.next())
-				{
-					sql = "select max(dingdanbianhao) from shangpindingdan";
-					pst = conn.prepareStatement(sql);
-					rs = pst.executeQuery();
-					rs.next();
-					dingdanbianhao = rs.getInt(1) + 1;
-				}
-				sql = "insert into dingdanxiangqing(dingdanbianhao,shangpinbianhao,shuliang,jiage,zhekou,manzhebianhao) values(?,?,?,?,?,?)";
-				pst = conn.prepareStatement(sql);
-				pst.setInt(1, dingdanbianhao);
-				pst.setInt(2, allGouwuche.get(i).getShangpinbianhao());
-				pst.setDouble(3, allGouwuche.get(i).getShuliang());
-				pst.setDouble(4, allGouwuche.get(i).getJiage());
-				pst.setDouble(5, zhekou);
-				pst.setInt(6, manzhebianhao);
-				pst.execute();
-				}
-				}
+				java.sql.ResultSet rs=pst.executeQuery();
+				if(!rs.next()) throw new BusinessException ("商品不存在");
 				else
 				{
-					meixiangjine = allGouwuche.get(i).getShuliang() * allGouwuche.get(i).getJiage();
-					int dingdanbianhao = 1;
-					sql = "select yonghubianhao from shangpindingdan";
-					pst = conn.prepareStatement(sql);
-					rs = pst.executeQuery();
-					if (rs.next())
+					double shangpinshuliang = rs.getDouble(1);
+					if (shangpinshuliang < allGouwuche.get(i).getShuliang())
 					{
-						sql = "select max(dingdanbianhao) from shangpindingdan";
-						pst = conn.prepareStatement(sql);
-						rs = pst.executeQuery();
-						rs.next();
-						dingdanbianhao = rs.getInt(1) + 1;
+						throw new BusinessException("商品数量不足，无法够买");
 					}
-					sql = "insert into dingdanxiangqing(dingdanbianhao,shangpinbianhao,shuliang,jiage,zhekou) values(?,?,?,?,?)";
-					pst = conn.prepareStatement(sql);
-					pst.setInt(1, dingdanbianhao);
-					pst.setInt(2, allGouwuche.get(i).getShangpinbianhao());
-					pst.setDouble(3, allGouwuche.get(i).getShuliang());
-					pst.setDouble(4, allGouwuche.get(i).getJiage());
-					pst.setDouble(5, 1);
-					pst.execute();
 				}
+				rs.close();
+				pst.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
 				throw new DbException(e);
@@ -658,32 +633,367 @@ public class YonghuManager implements IYonghuManager {
 						e.printStackTrace();
 					}
 			}
-			jine = jine + meixiangjine;
 		}
-		Connection conn=null;
+		for (int i = 0;i < allGouwuche.size();i++)
+		{
+			double meixiangjine = 0;
+			double yuanmeixiangjine = 0;
+			try {
+				conn=DBUtil.getConnection();
+				String sql="select a.manzhebianhao,zhekou,shiyongshangpinshuliang from manzheshangpinguanlian a,manzhe b where a.manzhebianhao = b.manzhebianhao and a.shangpinbianhao = ?";
+				java.sql.PreparedStatement pst=conn.prepareStatement(sql);
+				pst.setInt(1,allGouwuche.get(i).getShangpinbianhao());
+				java.sql.ResultSet rs = pst.executeQuery();
+				if (rs.next())
+				{//有满折编号
+				     int manzhebianhao = rs.getInt(1);
+				     double zhekou = rs.getDouble(2);
+				     double shiyongshangpinshuliang = rs.getDouble(3);
+				     if (shiyongshangpinshuliang > allGouwuche.get(i).getShuliang())
+				     {//有满折编号但数量不够
+					      sql = "select cuxiaojiage,cuxiaoshuliang from xianshicuxiao where shangpinbianhao = ?";
+					      pst = conn.prepareStatement(sql);
+					      pst.setInt(1, allGouwuche.get(i).getShangpinbianhao());
+					      rs = pst.executeQuery();
+					      if (rs.next())
+					      {//有满折编号但数量不够，是促销商品
+					            double cuxiaojiage = rs.getDouble(1);
+					            double cuxiaoshuliang = rs.getDouble(2);
+					            if (cuxiaoshuliang >= allGouwuche.get(i).getShuliang())
+					            {//有满折编号但数量不够，是促销商品，促销数量大于等于购买数量
+					            	xianshicuxiaoflag = 1;
+					            	meixiangjine = cuxiaojiage * allGouwuche.get(i).getShuliang();
+					            	yuanmeixiangjine = allGouwuche.get(i).getJiage() * allGouwuche.get(i).getShuliang();
+					            	int dingdanbianhao = 1;
+								      sql = "select yonghubianhao from shangpindingdan";
+								      pst = conn.prepareStatement(sql);
+								      rs = pst.executeQuery();
+								      if (rs.next())
+								      {
+									       sql = "select max(dingdanbianhao) from shangpindingdan";
+									       pst = conn.prepareStatement(sql);
+									       rs = pst.executeQuery();
+									       rs.next();
+									       dingdanbianhao = rs.getInt(1) + 1;
+								      }
+								      sql = "insert into dingdanxiangqing(dingdanbianhao,shangpinbianhao,shuliang,jiage,zhekou) values(?,?,?,?,?)";
+								      pst = conn.prepareStatement(sql);
+								      pst.setInt(1, dingdanbianhao);
+								      pst.setInt(2, allGouwuche.get(i).getShangpinbianhao());
+								      pst.setDouble(3, allGouwuche.get(i).getShuliang());
+								      pst.setDouble(4, cuxiaojiage);
+								      pst.setDouble(5, 1);
+								      pst.execute();
+								      sql = "update xianshicuxiao set cuxiaoshuliang = cuxiaoshuliang - ? where shangpinbianhao = ?";
+								      pst = conn.prepareStatement(sql);
+								      pst.setDouble(1,allGouwuche.get(i).getShuliang());
+								      pst.setInt(2, allGouwuche.get(i).getShangpinbianhao());
+								      pst.execute();
+								      sql = "update shangpin set shuliang = shuliang - ? where shangpinbianhao = ?";
+									  pst = conn.prepareStatement(sql);
+									  pst.setDouble(1, allGouwuche.get(i).getShuliang());
+									  pst.setInt(2, allGouwuche.get(i).getShangpinbianhao());
+									  pst.execute();
+					            }
+					            else
+					            {//有满折编号但数量不够，是促销商品，促销数量小于购买数量
+					            	meixiangjine = cuxiaoshuliang * cuxiaojiage + (allGouwuche.get(i).getShuliang() - cuxiaoshuliang) * allGouwuche.get(i).getJiage();
+					            	yuanmeixiangjine = allGouwuche.get(i).getJiage() * allGouwuche.get(i).getShuliang();
+					            	int dingdanbianhao = 1;
+								      sql = "select yonghubianhao from shangpindingdan";
+								      pst = conn.prepareStatement(sql);
+								      rs = pst.executeQuery();
+								      if (rs.next())
+								      {
+									       sql = "select max(dingdanbianhao) from shangpindingdan";
+									       pst = conn.prepareStatement(sql);
+									       rs = pst.executeQuery();
+									       rs.next();
+									       dingdanbianhao = rs.getInt(1) + 1;
+								      }
+								      if (cuxiaoshuliang != 0)
+								      {
+								      xianshicuxiaoflag = 1;
+								      sql = "insert into dingdanxiangqing(dingdanbianhao,shangpinbianhao,shuliang,jiage,zhekou) values(?,?,?,?,?)";
+								      pst = conn.prepareStatement(sql);
+								      pst.setInt(1, dingdanbianhao);
+								      pst.setInt(2, allGouwuche.get(i).getShangpinbianhao());
+								      pst.setDouble(3, cuxiaoshuliang);
+								      pst.setDouble(4, cuxiaojiage);
+								      pst.setDouble(5, 1);
+								      pst.execute();
+								      sql = "insert into dingdanxiangqing(dingdanbianhao,shangpinbianhao,shuliang,jiage,zhekou) values(?,?,?,?,?)";
+								      pst = conn.prepareStatement(sql);
+								      pst.setInt(1, dingdanbianhao);
+								      pst.setInt(2, allGouwuche.get(i).getShangpinbianhao());
+								      pst.setDouble(3, allGouwuche.get(i).getShuliang() - cuxiaoshuliang);
+								      pst.setDouble(4, allGouwuche.get(i).getJiage());
+								      pst.setDouble(5, 1);
+								      pst.execute();
+								      sql = "update xianshicuxiao set cuxiaoshuliang = 0 where shangpinbianhao = ?";
+								      pst = conn.prepareStatement(sql);
+								      pst.setInt(1, allGouwuche.get(i).getShangpinbianhao());
+								      pst.execute();
+								      sql = "update shangpin set shuliang = shuliang - ? where shangpinbianhao = ?";
+									  pst = conn.prepareStatement(sql);
+									  pst.setDouble(1, allGouwuche.get(i).getShuliang());
+									  pst.setInt(2, allGouwuche.get(i).getShangpinbianhao());
+									  pst.execute();
+								      }
+								      else
+								      {
+								    	  sql = "insert into dingdanxiangqing(dingdanbianhao,shangpinbianhao,shuliang,jiage,zhekou) values(?,?,?,?,?)";
+									      pst = conn.prepareStatement(sql);
+									      pst.setInt(1, dingdanbianhao);
+									      pst.setInt(2, allGouwuche.get(i).getShangpinbianhao());
+									      pst.setDouble(3, allGouwuche.get(i).getShuliang() - cuxiaoshuliang);
+									      pst.setDouble(4, allGouwuche.get(i).getJiage());
+									      pst.setDouble(5, 1);
+									      pst.execute();
+									      sql = "update xianshicuxiao set cuxiaoshuliang = 0 where shangpinbianhao = ?";
+									      pst = conn.prepareStatement(sql);
+									      pst.setInt(1, allGouwuche.get(i).getShangpinbianhao());
+									      pst.execute();
+									      sql = "update shangpin set shuliang = shuliang - ? where shangpinbianhao = ?";
+										  pst = conn.prepareStatement(sql);
+										  pst.setDouble(1, allGouwuche.get(i).getShuliang());
+										  pst.setInt(2, allGouwuche.get(i).getShangpinbianhao());
+										  pst.execute();
+								      }
+					            }
+					            
+					      }
+					      else
+					      {//有满折编号但数量不够，不是促销商品
+					           meixiangjine = allGouwuche.get(i).getJiage() * allGouwuche.get(i).getShuliang();
+					           yuanmeixiangjine = meixiangjine;
+					           int dingdanbianhao = 1;
+							      sql = "select yonghubianhao from shangpindingdan";
+							      pst = conn.prepareStatement(sql);
+							      rs = pst.executeQuery();
+							      if (rs.next())
+							      {
+								       sql = "select max(dingdanbianhao) from shangpindingdan";
+								       pst = conn.prepareStatement(sql);
+								       rs = pst.executeQuery();
+								       rs.next();
+								       dingdanbianhao = rs.getInt(1) + 1;
+							      }
+							      sql = "insert into dingdanxiangqing(dingdanbianhao,shangpinbianhao,shuliang,jiage,zhekou) values(?,?,?,?,?)";
+							      pst = conn.prepareStatement(sql);
+							      pst.setInt(1, dingdanbianhao);
+							      pst.setInt(2, allGouwuche.get(i).getShangpinbianhao());
+							      pst.setDouble(3, allGouwuche.get(i).getShuliang());
+							      pst.setDouble(4, allGouwuche.get(i).getJiage());
+							      pst.setDouble(5, 1);
+							      pst.execute();
+							      sql = "update shangpin set shuliang = shuliang - ? where shangpinbianhao = ?";
+								  pst = conn.prepareStatement(sql);
+								  pst.setDouble(1, allGouwuche.get(i).getShuliang());
+								  pst.setInt(2, allGouwuche.get(i).getShangpinbianhao());
+								  pst.execute();
+					      }
+				}
+				else 
+				{//有满折编号数量够
+					 manzheflag = 1;
+				     meixiangjine = allGouwuche.get(i).getJiage() * allGouwuche.get(i).getShuliang() * zhekou;
+				     yuanmeixiangjine = allGouwuche.get(i).getJiage() * allGouwuche.get(i).getShuliang();
+				     int dingdanbianhao = 1;
+				     sql = "select yonghubianhao from shangpindingdan";
+				     pst = conn.prepareStatement(sql);
+				     rs = pst.executeQuery();
+				     if (rs.next())
+				     {
+					      sql = "select max(dingdanbianhao) from shangpindingdan";
+					      pst = conn.prepareStatement(sql);
+					      rs = pst.executeQuery();
+					      rs.next();
+					      dingdanbianhao = rs.getInt(1) + 1;
+				     }
+				     sql = "insert into dingdanxiangqing(dingdanbianhao,shangpinbianhao,shuliang,jiage,zhekou,manzhebianhao) values(?,?,?,?,?,?)";
+				     pst = conn.prepareStatement(sql);
+				     pst.setInt(1, dingdanbianhao);
+				     pst.setInt(2, allGouwuche.get(i).getShangpinbianhao());
+				     pst.setDouble(3, allGouwuche.get(i).getShuliang());
+				     pst.setDouble(4, allGouwuche.get(i).getJiage());
+				     pst.setDouble(5, zhekou);
+				     pst.setInt(6, manzhebianhao);
+				     pst.execute();
+				     sql = "update shangpin set shuliang = shuliang - ? where shangpinbianhao = ?";
+						pst = conn.prepareStatement(sql);
+						pst.setDouble(1, allGouwuche.get(i).getShuliang());
+						pst.setInt(2, allGouwuche.get(i).getShangpinbianhao());
+						pst.execute();
+				}
+			    }
+				else
+				{//无满折编号
+					sql = "select cuxiaojiage,cuxiaoshuliang from xianshicuxiao where shangpinbianhao = ?";
+				      pst = conn.prepareStatement(sql);
+				      pst.setInt(1, allGouwuche.get(i).getShangpinbianhao());
+				      rs = pst.executeQuery();
+				      if (rs.next())
+				      {//无满折编号，但有限时促销
+				            double cuxiaojiage = rs.getDouble(1);
+				            double cuxiaoshuliang = rs.getDouble(2);
+				            if (cuxiaoshuliang >= allGouwuche.get(i).getShuliang())
+				            {//无满折编号，有限时促销，促销数量大于等于购买数量
+				            	xianshicuxiaoflag = 1;
+				            	meixiangjine = cuxiaojiage * allGouwuche.get(i).getShuliang();
+				            	yuanmeixiangjine = allGouwuche.get(i).getJiage() * allGouwuche.get(i).getShuliang();
+				            	int dingdanbianhao = 1;
+							      sql = "select yonghubianhao from shangpindingdan";
+							      pst = conn.prepareStatement(sql);
+							      rs = pst.executeQuery();
+							      if (rs.next())
+							      {
+								       sql = "select max(dingdanbianhao) from shangpindingdan";
+								       pst = conn.prepareStatement(sql);
+								       rs = pst.executeQuery();
+								       rs.next();
+								       dingdanbianhao = rs.getInt(1) + 1;
+							      }
+							      sql = "insert into dingdanxiangqing(dingdanbianhao,shangpinbianhao,shuliang,jiage,zhekou) values(?,?,?,?,?)";
+							      pst = conn.prepareStatement(sql);
+							      pst.setInt(1, dingdanbianhao);
+							      pst.setInt(2, allGouwuche.get(i).getShangpinbianhao());
+							      pst.setDouble(3, allGouwuche.get(i).getShuliang());
+							      pst.setDouble(4, cuxiaojiage);
+							      pst.setDouble(5, 1);
+							      pst.execute();
+							      sql = "update xianshicuxiao set cuxiaoshuliang = cuxiaoshuliang - ? where shangpinbianhao = ?";
+							      pst = conn.prepareStatement(sql);
+							      pst.setDouble(1,allGouwuche.get(i).getShuliang());
+							      pst.setInt(2, allGouwuche.get(i).getShangpinbianhao());
+							      pst.execute();
+							      sql = "update shangpin set shuliang = shuliang - ? where shangpinbianhao = ?";
+								    pst = conn.prepareStatement(sql);
+									pst.setDouble(1, allGouwuche.get(i).getShuliang());
+									pst.setInt(2, allGouwuche.get(i).getShangpinbianhao());
+									pst.execute();
+				            }
+				            else
+				            {//无满折编号，有限时促销，促销数量小于购买数量
+				            	meixiangjine = cuxiaoshuliang * cuxiaojiage + (allGouwuche.get(i).getShuliang() - cuxiaoshuliang) * allGouwuche.get(i).getJiage();
+				            	yuanmeixiangjine = allGouwuche.get(i).getJiage() * allGouwuche.get(i).getShuliang();
+				            	int dingdanbianhao = 1;
+							      sql = "select yonghubianhao from shangpindingdan";
+							      pst = conn.prepareStatement(sql);
+							      rs = pst.executeQuery();
+							      if (rs.next())
+							      {
+								       sql = "select max(dingdanbianhao) from shangpindingdan";
+								       pst = conn.prepareStatement(sql);
+								       rs = pst.executeQuery();
+								       rs.next();
+								       dingdanbianhao = rs.getInt(1) + 1;
+							      }
+							      if (cuxiaoshuliang != 0)
+							      {
+							      xianshicuxiaoflag = 1;
+							      sql = "insert into dingdanxiangqing(dingdanbianhao,shangpinbianhao,shuliang,jiage,zhekou) values(?,?,?,?,?)";
+							      pst = conn.prepareStatement(sql);
+							      pst.setInt(1, dingdanbianhao);
+							      pst.setInt(2, allGouwuche.get(i).getShangpinbianhao());
+							      pst.setDouble(3, cuxiaoshuliang);
+							      pst.setDouble(4, cuxiaojiage);
+							      pst.setDouble(5, 1);
+							      pst.execute();
+							      sql = "insert into dingdanxiangqing(dingdanbianhao,shangpinbianhao,shuliang,jiage,zhekou) values(?,?,?,?,?)";
+							      pst = conn.prepareStatement(sql);
+							      pst.setInt(1, dingdanbianhao);
+							      pst.setInt(2, allGouwuche.get(i).getShangpinbianhao());
+							      pst.setDouble(3, allGouwuche.get(i).getShuliang() - cuxiaoshuliang);
+							      pst.setDouble(4, allGouwuche.get(i).getJiage());
+							      pst.setDouble(5, 1);
+							      pst.execute();
+							      sql = "update xianshicuxiao set cuxiaoshuliang = 0 where shangpinbianhao = ?";
+							      pst = conn.prepareStatement(sql);
+							      pst.setInt(1, allGouwuche.get(i).getShangpinbianhao());
+							      pst.execute();
+							      sql = "update shangpin set shuliang = shuliang - ? where shangpinbianhao = ?";
+									pst = conn.prepareStatement(sql);
+									pst.setDouble(1, allGouwuche.get(i).getShuliang());
+									pst.setInt(2, allGouwuche.get(i).getShangpinbianhao());
+									pst.execute();
+							      }
+							      else
+							      {
+							    	  sql = "insert into dingdanxiangqing(dingdanbianhao,shangpinbianhao,shuliang,jiage,zhekou) values(?,?,?,?,?)";
+								      pst = conn.prepareStatement(sql);
+								      pst.setInt(1, dingdanbianhao);
+								      pst.setInt(2, allGouwuche.get(i).getShangpinbianhao());
+								      pst.setDouble(3, allGouwuche.get(i).getShuliang() - cuxiaoshuliang);
+								      pst.setDouble(4, allGouwuche.get(i).getJiage());
+								      pst.setDouble(5, 1);
+								      pst.execute();
+								      sql = "update xianshicuxiao set cuxiaoshuliang = 0 where shangpinbianhao = ?";
+								      pst = conn.prepareStatement(sql);
+								      pst.setInt(1, allGouwuche.get(i).getShangpinbianhao());
+								      pst.execute();
+								      sql = "update shangpin set shuliang = shuliang - ? where shangpinbianhao = ?";
+										pst = conn.prepareStatement(sql);
+										pst.setDouble(1, allGouwuche.get(i).getShuliang());
+										pst.setInt(2, allGouwuche.get(i).getShangpinbianhao());
+										pst.execute();
+							      }
+				            }
+				      }
+				      else
+				      {//无满折编号，无限时促销
+				    	  meixiangjine = allGouwuche.get(i).getShuliang() * allGouwuche.get(i).getJiage();
+				    	  yuanmeixiangjine = meixiangjine;
+				    	  int dingdanbianhao = 1;
+					      sql = "select yonghubianhao from shangpindingdan";
+					      pst = conn.prepareStatement(sql);
+					      rs = pst.executeQuery();
+					      if (rs.next())
+					      {
+						       sql = "select max(dingdanbianhao) from shangpindingdan";
+						       pst = conn.prepareStatement(sql);
+						       rs = pst.executeQuery();
+						       rs.next();
+						       dingdanbianhao = rs.getInt(1) + 1;
+					      }
+					      sql = "insert into dingdanxiangqing(dingdanbianhao,shangpinbianhao,shuliang,jiage,zhekou) values(?,?,?,?,?)";
+					      pst = conn.prepareStatement(sql);
+					      pst.setInt(1, dingdanbianhao);
+					      pst.setInt(2, allGouwuche.get(i).getShangpinbianhao());
+					      pst.setDouble(3, allGouwuche.get(i).getShuliang());
+					      pst.setDouble(4, allGouwuche.get(i).getJiage());
+					      pst.setDouble(5, 1);
+					      pst.execute();
+					      sql = "update shangpin set shuliang = shuliang - ? where shangpinbianhao = ?";
+							pst = conn.prepareStatement(sql);
+							pst.setDouble(1, allGouwuche.get(i).getShuliang());
+							pst.setInt(2, allGouwuche.get(i).getShangpinbianhao());
+							pst.execute();
+				      }
+				}
+			}catch (SQLException e) {
+				e.printStackTrace();
+				throw new DbException(e);
+			}
+			finally{
+				if(conn!=null)
+					try {
+						conn.close();
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+			}
+			jine = jine + meixiangjine;
+			yuanjine = yuanjine + yuanmeixiangjine;
+		}
 		try {
 			conn=DBUtil.getConnection();
-			String sql="delete from gouwuche where yonghubianhao = ?";
-			java.sql.PreparedStatement pst=conn.prepareStatement(sql);
-			pst.setInt(1,BeanYonghu.currentLoginYonghu.getYonghubianhao());
-			pst.execute();
-			int dingdanbianhao = 1;
-			sql = "select yonghubianhao from shangpindingdan";
-			pst = conn.prepareStatement(sql);
-			java.sql.ResultSet rs = pst.executeQuery();
-			if (rs.next())
-			{
-				sql = "select max(dingdanbianhao) from shangpindingdan";
-				pst = conn.prepareStatement(sql);
-				rs = pst.executeQuery();
-				rs.next();
-				dingdanbianhao = rs.getInt(1) + 1;
-			}
 			int peisongdizhibianhao;
-			sql = "select dizhibianhao from peisongdizhi where yonghubianhao = ?";
-			pst = conn.prepareStatement(sql);
+			String sql = "select dizhibianhao from peisongdizhi where yonghubianhao = ?";
+			java.sql.PreparedStatement pst = conn.prepareStatement(sql);
 			pst.setInt(1, BeanYonghu.currentLoginYonghu.getYonghubianhao());
-			rs = pst.executeQuery();
+			java.sql.ResultSet rs = pst.executeQuery();
 			if (!rs.next())
 			{
 				throw new BusinessException("地址不存在，请先编辑地址");
@@ -692,25 +1002,111 @@ public class YonghuManager implements IYonghuManager {
 			{
 				peisongdizhibianhao = rs.getInt(1);
 			}
-			sql = "insert into shangpindingdan(dingdanbianhao,yonghubianhao,yuanshijine,jiesuanjine,shiyongyouhuiquanbianhao,yaoqiusongdashijian,peisongdizhibianhao,dingdanzhuangtai) values(?,?,?,?,NULL,?,?,?)";
+			int flag = 1;
+			int j = 1;
+			double yuanjianmianjine = 0;
+			double yuanshiyongjine = 0;
+			double jianmianjine = 0;
+			double shiyongjine = 0;
+			while(flag == 1)
+			{
+			sql = "select shiyongjine,jianmianjine from youhuiquan where youhuiquanbianhao = ?";
+			pst = conn.prepareStatement(sql);
+			pst.setInt(1, j);
+			rs = pst.executeQuery();
+			if (rs.next())
+			{
+				shiyongjine = rs.getDouble(1);
+				jianmianjine = rs.getDouble(2);
+				if (shiyongjine <= jine)
+				{
+					j++;
+					yuanjianmianjine = jianmianjine;
+					yuanshiyongjine = shiyongjine;
+				}
+				else
+				{
+					flag = 0;
+					break;
+				}
+			}
+			else
+			{
+				flag = 0;
+				break;
+			}
+			}
+			j = j - 1;
+			youhuiquanbianhao = j;
+			youhuijine = yuanjianmianjine;
+			jine = jine - yuanjianmianjine;
+			int dingdanbianhao = 1;
+			sql = "select yonghubianhao from shangpindingdan";
+			pst = conn.prepareStatement(sql);
+			rs = pst.executeQuery();
+			if (rs.next())
+			{
+				sql = "select max(dingdanbianhao) from shangpindingdan";
+				pst = conn.prepareStatement(sql);
+				rs = pst.executeQuery();
+				rs.next();
+				dingdanbianhao = rs.getInt(1) + 1;
+			}
+			if (youhuiquanbianhao != 0)
+			{
+		    youhuiquanflag = 1;
+		    BigDecimal bg = new BigDecimal(jine);
+		    double jine1 = bg.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+			sql = "insert into shangpindingdan(dingdanbianhao,yonghubianhao,yuanshijine,jiesuanjine,shiyongyouhuiquanbianhao,yaoqiusongdashijian,peisongdizhibianhao,dingdanzhuangtai) values(?,?,?,?,?,?,?,?)";
 			pst = conn.prepareStatement(sql);
 			pst.setInt(1, dingdanbianhao);
 			pst.setInt(2, BeanYonghu.currentLoginYonghu.getYonghubianhao());
-			pst.setDouble(3, jine);
-			pst.setDouble(4, jine);
-			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			pst.setDouble(3, yuanjine);
+			pst.setDouble(4, jine1);
+			pst.setInt(5,j);
+		    format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			try {
 				Timestamp time = new Timestamp(format.parse(songdashijian).getTime());
-				pst.setTimestamp(5, time);
+				pst.setTimestamp(6, time);
 			} catch (ParseException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 				throw new BusinessException("送达时间格式错误");
 			}
-			pst.setInt(6, peisongdizhibianhao);
+			pst.setInt(7, peisongdizhibianhao);
 			String a = "xiadan";
-			pst.setString(7, a);
+			pst.setString(8, a);
 			pst.execute();
+			}
+			else
+			{
+				youhuiquanflag = 0;
+				BigDecimal bg = new BigDecimal(jine);
+			    double jine1 = bg.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+				sql = "insert into shangpindingdan(dingdanbianhao,yonghubianhao,yuanshijine,jiesuanjine,yaoqiusongdashijian,peisongdizhibianhao,dingdanzhuangtai) values(?,?,?,?,?,?,?)";
+				pst = conn.prepareStatement(sql);
+				pst.setInt(1, dingdanbianhao);
+				pst.setInt(2, BeanYonghu.currentLoginYonghu.getYonghubianhao());
+				pst.setDouble(3, yuanjine);
+				pst.setDouble(4, jine1);
+				format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				try {
+					Timestamp time = new Timestamp(format.parse(songdashijian).getTime());
+					pst.setTimestamp(5, time);
+				} catch (ParseException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+					throw new BusinessException("送达时间格式错误");
+				}
+				pst.setInt(6, peisongdizhibianhao);
+				String a = "xiadan";
+				pst.setString(7, a);
+				pst.execute();
+			}
+			sql="delete from gouwuche where yonghubianhao = ?";
+			pst=conn.prepareStatement(sql);
+			pst.setInt(1,BeanYonghu.currentLoginYonghu.getYonghubianhao());
+			pst.execute();		
 			} catch (SQLException e) {
 			e.printStackTrace();
 			throw new DbException(e);
@@ -724,7 +1120,40 @@ public class YonghuManager implements IYonghuManager {
 					e.printStackTrace();
 				}
 		}
-		JOptionPane.showMessageDialog(null,"购买需要" + jine + "元", "结果",JOptionPane.PLAIN_MESSAGE);
+		BigDecimal bg = new BigDecimal(jine);
+	    double jine1 = bg.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+		if (xianshicuxiaoflag == 1 && youhuiquanflag == 1 && manzheflag == 1)
+		{
+		JOptionPane.showMessageDialog(null,"您的商品中存在满折优惠，已为您使用满折优惠\n"+"您的商品中存在限时促销优惠，已为您尽可能替换优惠价格\n"+"已使用最接近您的购买金额的优惠券编号为"+youhuiquanbianhao+"的优惠券，为您节省"+youhuijine+"元\n"+"购买需要"+jine1+"元", "结果",JOptionPane.PLAIN_MESSAGE);
+		}
+		else if (xianshicuxiaoflag == 0 && youhuiquanflag == 1 && manzheflag == 1)
+		{
+			JOptionPane.showMessageDialog(null,"您的商品中存在满折优惠，已为您使用满折优惠\n"+"已使用最接近您的购买金额的优惠券编号为"+youhuiquanbianhao+"的优惠券，为您节省"+youhuijine+"元\n"+"购买需要"+jine1+"元", "结果",JOptionPane.PLAIN_MESSAGE);
+		}
+		else if (xianshicuxiaoflag == 1 && youhuiquanflag == 0 && manzheflag == 1)
+		{
+			JOptionPane.showMessageDialog(null,"您的商品中存在满折优惠，已为您使用满折优惠\n"+"您的商品中存在限时促销优惠，已为您尽可能替换优惠价格\n"+"购买需要"+jine1+"元", "结果",JOptionPane.PLAIN_MESSAGE);
+		}
+		else if (xianshicuxiaoflag == 0 && youhuiquanflag == 0 && manzheflag == 1)
+		{
+			JOptionPane.showMessageDialog(null,"您的商品中存在满折优惠，已为您使用满折优惠\n"+"购买需要"+jine1+"元", "结果",JOptionPane.PLAIN_MESSAGE);
+		}
+		else if (xianshicuxiaoflag == 1 && youhuiquanflag == 1 && manzheflag == 0)
+		{
+			JOptionPane.showMessageDialog(null,"您的商品中存在限时促销优惠，已为您尽可能替换优惠价格\n"+"已使用最接近您的购买金额的优惠券编号为"+youhuiquanbianhao+"的优惠券，为您节省"+youhuijine+"元\n"+"购买需要"+jine1+"元", "结果",JOptionPane.PLAIN_MESSAGE);
+		}
+		else if (xianshicuxiaoflag == 0 && youhuiquanflag == 1 && manzheflag == 0)
+		{
+			JOptionPane.showMessageDialog(null,"已使用最接近您的购买金额的优惠券编号为"+youhuiquanbianhao+"的优惠券，为您节省"+youhuijine+"元\n"+"购买需要"+jine1+"元", "结果",JOptionPane.PLAIN_MESSAGE);
+		}
+		else if (xianshicuxiaoflag == 1 && youhuiquanflag == 0 && manzheflag == 0)
+		{
+			JOptionPane.showMessageDialog(null,"您的商品中存在限时促销优惠，已为您尽可能替换优惠价格\n"+"购买需要"+jine1+"元", "结果",JOptionPane.PLAIN_MESSAGE);
+		}
+		else if (xianshicuxiaoflag == 0 && youhuiquanflag == 0 && manzheflag == 0)
+		{
+			JOptionPane.showMessageDialog(null,"购买需要"+jine1+"元", "结果",JOptionPane.PLAIN_MESSAGE);
+		}
 		return BeanYonghu.currentLoginYonghu;
 	}
 	
@@ -773,6 +1202,175 @@ public class YonghuManager implements IYonghuManager {
 			pst.execute();
 			JOptionPane.showMessageDialog(null,"评价成功", "结果",JOptionPane.PLAIN_MESSAGE);
 			rs.close();
+			pst.close();
+			return BeanYonghu.currentLoginYonghu;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}
+		finally{
+			if(conn!=null)
+				try {
+					conn.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		}
+	}
+	
+	public BeanYonghu Bianjipingjia(String shangpinbianhao,String pingjianeirong,String xingji,String zhaopian) throws BaseException
+	{
+		if (shangpinbianhao == null || "".equals(shangpinbianhao))
+		{
+			throw new BusinessException("商品编号不能为空");
+		}
+		if (pingjianeirong == null || "".equals(pingjianeirong))
+		{
+			throw new BusinessException("评价内容不能为空");
+		}
+		if (xingji == null || "".equals(xingji))
+		{
+			throw new BusinessException("星级不能为空");
+		}
+		if (zhaopian == null || "".equals(zhaopian))
+		{
+			throw new BusinessException("照片不能为空");
+		}
+		Connection conn=null;
+		try {
+			conn=DBUtil.getConnection();
+			String sql="select pingjianeirong from shangpinpingjia where shangpinbianhao = ? and pingjiayonghubianhao = ?";
+			java.sql.PreparedStatement pst=conn.prepareStatement(sql);
+			pst.setInt(1,Integer.valueOf(shangpinbianhao));
+			pst.setInt(2, BeanYonghu.currentLoginYonghu.getYonghubianhao());
+			java.sql.ResultSet rs=pst.executeQuery();
+			if(!rs.next()) throw new BusinessException ("评价不存在");
+			sql = "update shangpinpingjia set pingjianeirong = ?,pingjiariqi = NOW(),xingji = ?,zhaopian = ? where shangpinbianhao = ? and pingjiayonghubianhao = ?";
+			pst = conn.prepareStatement(sql);
+			pst.setInt(4, Integer.valueOf(shangpinbianhao));
+			pst.setInt(5, BeanYonghu.currentLoginYonghu.getYonghubianhao());
+			pst.setString(1, pingjianeirong);
+			pst.setInt(2, Integer.valueOf(xingji));
+			pst.setString(3, zhaopian);
+			pst.execute();
+			JOptionPane.showMessageDialog(null,"更新成功", "结果",JOptionPane.PLAIN_MESSAGE);
+			rs.close();
+			pst.close();
+			return BeanYonghu.currentLoginYonghu;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}
+		finally{
+			if(conn!=null)
+				try {
+					conn.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		}
+	}
+	
+	public BeanYonghu Shanchupingjia(String shangpinbianhao) throws BaseException
+	{
+		if (shangpinbianhao == null || "".equals(shangpinbianhao))
+		{
+			throw new BusinessException("商品编号不能为空");
+		}
+		Connection conn=null;
+		try {
+			conn=DBUtil.getConnection();
+			String sql="select pingjianeirong from shangpinpingjia where shangpinbianhao = ? and pingjiayonghubianhao = ?";
+			java.sql.PreparedStatement pst=conn.prepareStatement(sql);
+			pst.setInt(1,Integer.valueOf(shangpinbianhao));
+			pst.setInt(2, BeanYonghu.currentLoginYonghu.getYonghubianhao());
+			java.sql.ResultSet rs=pst.executeQuery();
+			if(!rs.next()) throw new BusinessException ("评价不存在");
+			sql = "delete from shangpinpingjia where shangpinbianhao = ? and pingjiayonghubianhao = ?";
+			pst = conn.prepareStatement(sql);
+			pst.setInt(1, Integer.valueOf(shangpinbianhao));
+			pst.setInt(2,BeanYonghu.currentLoginYonghu.getYonghubianhao());
+			pst.execute();
+			JOptionPane.showMessageDialog(null,"删除成功", "结果",JOptionPane.PLAIN_MESSAGE);
+			rs.close();
+			pst.close();
+			return BeanYonghu.currentLoginYonghu;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}
+		finally{
+			if(conn!=null)
+				try {
+					conn.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		}
+	}
+	
+	public BeanYonghu Xiugaishuliang(BeanGouwuche Gouwuche,String shuliang) throws BaseException
+	{
+		if (shuliang == null || "".equals(shuliang))
+		{
+			throw new BusinessException("商品数量不能为空");
+		}
+		Connection conn=null;
+		try {
+			conn=DBUtil.getConnection();
+			String sql="select shuliang from shangpin where shangpinbianhao = ?";
+			java.sql.PreparedStatement pst=conn.prepareStatement(sql);
+			pst.setInt(1,Integer.valueOf(Gouwuche.getShangpinbianhao()));
+			java.sql.ResultSet rs=pst.executeQuery();
+			if(!rs.next()) throw new BusinessException ("商品不存在");
+			else
+			{
+				double shangpinshuliang = rs.getDouble(1);
+				if (shangpinshuliang < Double.valueOf(shuliang))
+				{
+					throw new BusinessException("商品数量不足，无法够买");
+				}
+			}
+			sql = "update gouwuche set shuliang = ? where yonghubianhao = ? and gouwuchebianhao = ?";
+			pst = conn.prepareStatement(sql);
+			pst.setDouble(1, Double.valueOf(shuliang));
+			pst.setInt(2,BeanYonghu.currentLoginYonghu.getYonghubianhao());
+			pst.setInt(3, Gouwuche.getGouwuchebianhao());
+			pst.execute();
+			JOptionPane.showMessageDialog(null,"编辑成功", "结果",JOptionPane.PLAIN_MESSAGE);
+			rs.close();
+			pst.close();
+			return BeanYonghu.currentLoginYonghu;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}
+		finally{
+			if(conn!=null)
+				try {
+					conn.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		}
+	}
+	
+	public BeanYonghu Chengweihuiyuan(BeanYonghu user) throws BaseException
+	{
+		Connection conn=null;
+		try {
+			conn=DBUtil.getConnection();
+			String sql="update yonghu set shifouhuiyuan = 1,huiyuanjiezhishijian = ? where yonghubianhao = ?";
+			java.sql.PreparedStatement pst=conn.prepareStatement(sql);
+			Timestamp time = new Timestamp(System.currentTimeMillis() + 60 * 60 * 24 * 1000);
+			pst.setTimestamp(1,time);
+			pst.setInt(2, BeanYonghu.currentLoginYonghu.getYonghubianhao());
+			pst.execute();
+			JOptionPane.showMessageDialog(null,"开启一日会员成功", "结果",JOptionPane.PLAIN_MESSAGE);
 			pst.close();
 			return BeanYonghu.currentLoginYonghu;
 		} catch (SQLException e) {
