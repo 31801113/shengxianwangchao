@@ -23,15 +23,15 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
 import model.BeanDingdanxiangqing;
-import model.BeanShangpin;
 import model.BeanShangpindingdan;
-import model.BeanShengxianleibie;
 import starter.Util;
 import util.BaseException;
 
 public class FrmChaxunshangpindingdan extends JFrame implements ActionListener{
 	private static final long serialVersionUID = 1L;
 	private JMenuBar menubar=new JMenuBar();
+	private JMenu menu_Tuichu=new JMenu("退出");
+	private JMenuItem  menuItem_Tuichu=new JMenuItem("退出");
 	private JPanel statusBar = new JPanel();
 	
 	private Object tblShangpindingdanTitle[]=BeanShangpindingdan.tableTitles;
@@ -83,7 +83,9 @@ public class FrmChaxunshangpindingdan extends JFrame implements ActionListener{
 		this.dataTableDingdanxiangqing.repaint();
 	}
 	public FrmChaxunshangpindingdan(){
-		
+		this.menu_Tuichu.add(this.menuItem_Tuichu); this.menuItem_Tuichu.addActionListener(this);
+		 menubar.add(menu_Tuichu);
+		    this.setJMenuBar(menubar);
 		this.setExtendedState(Frame.MAXIMIZED_BOTH);
 		this.setTitle("查询结果");
 	    //菜单
@@ -112,8 +114,11 @@ public class FrmChaxunshangpindingdan extends JFrame implements ActionListener{
 	    this.setVisible(true);
 	}
 	@Override
-	public void actionPerformed(ActionEvent arg0) {
+	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
-		
+		if (e.getSource() == this.menuItem_Tuichu)
+		{
+			this.setVisible(false);
+		}
 	}
 }

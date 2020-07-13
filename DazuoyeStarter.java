@@ -11,5 +11,4 @@ public class DazuoyeStarter {
 		// TODO Auto-generated method stub
 		new FrmMain();
 	}
-	
 }

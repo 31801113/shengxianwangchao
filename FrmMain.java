@@ -307,7 +307,7 @@ public class FrmMain extends JFrame implements ActionListener{
         });
 	    if (dlgLogin.getflag() == 1)
 	    {
-	    this.setVisible(true);
+	        this.setVisible(true);
 	    }
 	    else
 	    {

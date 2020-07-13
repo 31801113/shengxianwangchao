@@ -134,6 +134,8 @@ public class FrmChaxungouwuche extends JFrame implements ActionListener{
 			{
 				JOptionPane.showMessageDialog(null,"送达时间不能为空", "错误",JOptionPane.ERROR_MESSAGE);
 			}
+			else
+			{
 			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			try {
 				Timestamp time = new Timestamp(format.parse(songdashijian).getTime());
@@ -150,6 +152,7 @@ public class FrmChaxungouwuche extends JFrame implements ActionListener{
 				e1.printStackTrace();
 			}
 			}
+			}
 		}
 		else if (e.getSource() == this.menuItem_Xiugaishuliang)
 		{
@@ -160,10 +163,17 @@ public class FrmChaxungouwuche extends JFrame implements ActionListener{
 			}
 			try {
 				String shuliang = JOptionPane.showInputDialog("请输入修改数量");
-				Util.yonghuManager.Xiugaishuliang(allGouwuche.get(i), shuliang);
+				if (Integer.valueOf(shuliang) == 0)
+				{
+					JOptionPane.showMessageDialog(null, "修改数量不能为0", "错误",JOptionPane.ERROR_MESSAGE);
+				}
+				else
+				{
+				BeanYonghu.currentLoginYonghu = Util.yonghuManager.Xiugaishuliang(allGouwuche.get(i), shuliang);
 				this.setVisible(false);
 				FrmChaxungouwuche dlg = new FrmChaxungouwuche();
 				dlg.setVisible(true);
+				}
 			} catch (BaseException e1) {
 				JOptionPane.showMessageDialog(null, e1.getMessage(), "错误",JOptionPane.ERROR_MESSAGE);
 				return;

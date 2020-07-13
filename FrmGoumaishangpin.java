@@ -26,6 +26,7 @@ import org.jboss.logging.DelegatingBasicLogger;
 
 import model.BeanShangpin;
 import model.BeanShengxianleibie;
+import model.BeanYonghu;
 import starter.Util;
 import util.BaseException;
 
@@ -137,7 +138,7 @@ public class FrmGoumaishangpin extends JFrame implements ActionListener {
 			}
 			try {
 				String shuliang = JOptionPane.showInputDialog("请输入购买的数量");
-				Util.yonghuManager.Jiarugouwuche(this.planShangpin.get(i), shuliang);
+				BeanYonghu.currentLoginYonghu = Util.yonghuManager.Jiarugouwuche(this.planShangpin.get(i), shuliang);
 			} catch (BaseException e1) {
 				JOptionPane.showMessageDialog(null, e1.getMessage(), "错误",JOptionPane.ERROR_MESSAGE);
 				return;

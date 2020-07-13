@@ -151,6 +151,9 @@ public class FrmYonghuMain extends JFrame implements ActionListener{
 			{
 				try {
 					BeanYonghu.currentLoginYonghu = Util.yonghuManager.Chengweihuiyuan(BeanYonghu.currentLoginYonghu);
+					this.setVisible(false);
+					FrmYonghuMain dlg = new FrmYonghuMain();
+					dlg.setVisible(true);
 				} catch (BaseException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();

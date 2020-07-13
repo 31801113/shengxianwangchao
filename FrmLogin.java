@@ -41,7 +41,7 @@ public class FrmLogin extends JDialog implements ActionListener {
 	private JLabel labelPwd = new JLabel("√‹¬Î£∫");
 	private JTextField edtUserId = new JTextField(20);
 	private JPasswordField edtPwd = new JPasswordField(20);
-	public int flag1 = 1;
+	public int flag1 = 0;
 	public FrmLogin(Frame f, String s, boolean b) {
 		super(f, s, b);
 		toolBar.setLayout(new FlowLayout(FlowLayout.RIGHT));
@@ -89,6 +89,7 @@ public class FrmLogin extends JDialog implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == this.btnLogin && radioBtn01.isSelected()) {
+			flag1 = 1;
 			String yuangongbianhao=new String(this.edtUserId.getText());
 			String denglumima=new String(this.edtPwd.getPassword());
 			try {

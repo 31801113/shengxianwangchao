@@ -13,6 +13,7 @@ import java.util.List;
 import javax.crypto.spec.PSource;
 import javax.swing.JOptionPane;
 
+import org.hibernate.query.criteria.internal.expression.function.SubstringFunction;
 import org.hibernate.sql.Insert;
 import org.hibernate.sql.Select;
 
@@ -21,6 +22,7 @@ import model.BeanGouwuche;
 import model.BeanGuanliyuan;
 import model.BeanShangpin;
 import model.BeanYonghu;
+import starter.Util;
 import util.BaseException;
 import util.BusinessException;
 import util.DBUtil;
@@ -1171,6 +1173,10 @@ public class YonghuManager implements IYonghuManager {
 		{
 			throw new BusinessException("星级不能为空");
 		}
+		if (!(Integer.valueOf(xingji) >=1 && Integer.valueOf(xingji) <=5))
+		{
+			throw new BusinessException("星级不能为除0-5之外的数字");
+		}
 		if (zhaopian == null || "".equals(zhaopian))
 		{
 			throw new BusinessException("照片不能为空");
@@ -1232,6 +1238,10 @@ public class YonghuManager implements IYonghuManager {
 		if (xingji == null || "".equals(xingji))
 		{
 			throw new BusinessException("星级不能为空");
+		}
+		if (!(Integer.valueOf(xingji) >=1 && Integer.valueOf(xingji) <=5))
+		{
+			throw new BusinessException("星级不能为除0-5之外的数字");
 		}
 		if (zhaopian == null || "".equals(zhaopian))
 		{
@@ -1370,7 +1380,23 @@ public class YonghuManager implements IYonghuManager {
 			pst.setTimestamp(1,time);
 			pst.setInt(2, BeanYonghu.currentLoginYonghu.getYonghubianhao());
 			pst.execute();
-			JOptionPane.showMessageDialog(null,"开启一日会员成功", "结果",JOptionPane.PLAIN_MESSAGE);
+			List<BeanGouwuche> allGouwuche = Util.gouwucheManager.loadAll();
+			for (int i = 0;i < allGouwuche.size();i++)
+			{
+				sql = "select huiyuanjia from shangpin where shangpinbianhao = ?";
+				pst = conn.prepareStatement(sql);
+				pst.setInt(1, allGouwuche.get(i).getShangpinbianhao());
+				java.sql.ResultSet rs = pst.executeQuery();
+				rs.next();
+				double huiyuanjia = rs.getDouble(1);
+				sql = "update gouwuche set jiage = ? where yonghubianhao = ? and shangpinbianhao = ?";
+				pst = conn.prepareStatement(sql);
+				pst.setDouble(1, huiyuanjia);
+				pst.setInt(2, BeanYonghu.currentLoginYonghu.getYonghubianhao());
+				pst.setInt(3, allGouwuche.get(i).getShangpinbianhao());
+				pst.execute();
+			}
+			JOptionPane.showMessageDialog(null,"开启一日会员成功，购物车价格已全部改为会员价", "结果",JOptionPane.PLAIN_MESSAGE);
 			pst.close();
 			return BeanYonghu.currentLoginYonghu;
 		} catch (SQLException e) {
